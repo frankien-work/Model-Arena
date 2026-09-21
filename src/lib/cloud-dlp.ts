@@ -11,6 +11,11 @@ export interface DlpDeidentifyResult {
   findings: DlpFinding[];
   isLiveApi: boolean;
   latencyMs: number;
+  apiDetails?: {
+    endpoint: string;
+    httpStatus?: number | string;
+    error?: string;
+  };
 }
 
 const COMMON_INFOTYPES = [
@@ -25,12 +30,19 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
   const token = await getGcpAccessToken();
   const projectId = await getGcpProjectId();
 
+  let liveError: string | null = null;
+  let liveHttpStatus: number | null = null;
+
   // Try live Google Cloud DLP API if credentials exist
   if (token && projectId) {
-    try {
-      const response = await fetch(
-        `https://dlp.googleapis.com/v2/projects/${projectId}/content:deidentify`,
-        {
+    const endpoints = [
+      `https://dlp.googleapis.com/v2/projects/${projectId}/locations/global/content:deidentify`,
+      `https://dlp.googleapis.com/v2/projects/${projectId}/content:deidentify`,
+    ];
+
+    for (const endpoint of endpoints) {
+      try {
+        const response = await fetch(endpoint, {
           method: 'POST',
           headers: {
             Authorization: `Bearer ${token}`,
@@ -55,35 +67,46 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
               minLikelihood: 'POSSIBLE',
             },
           }),
-        }
-      );
+        });
 
-      if (response.ok) {
-        const data = await response.json();
-        const transformedText = data.item?.value || text;
-        const findings: DlpFinding[] = [];
+        liveHttpStatus = response.status;
 
-        const summaries = data.overview?.transformationSummaries || [];
-        for (const summary of summaries) {
-          if (summary.infoType?.name && summary.count > 0) {
-            findings.push({
-              infoType: summary.infoType.name,
-              likelihood: 'CONFIRMED',
-              mitigation: `Cloud DLP tokenized ${summary.count} instance(s) with [${summary.infoType.name}]`,
-            });
+        if (response.ok) {
+          const data = await response.json();
+          const transformedText = data.item?.value || text;
+          const findings: DlpFinding[] = [];
+
+          const summaries = data.overview?.transformationSummaries || [];
+          for (const summary of summaries) {
+            if (summary.infoType?.name && summary.count > 0) {
+              findings.push({
+                infoType: summary.infoType.name,
+                likelihood: 'CONFIRMED',
+                mitigation: `Cloud DLP tokenized ${summary.count} instance(s) with [${summary.infoType.name}]`,
+              });
+            }
           }
-        }
 
-        return {
-          sanitizedText: transformedText,
-          findings,
-          isLiveApi: true,
-          latencyMs: Date.now() - startTime,
-        };
+          return {
+            sanitizedText: transformedText,
+            findings,
+            isLiveApi: true,
+            latencyMs: Date.now() - startTime,
+            apiDetails: {
+              endpoint,
+              httpStatus: response.status,
+            },
+          };
+        } else {
+          const body = await response.text();
+          liveError = `HTTP ${response.status}: ${body}`;
+        }
+      } catch (err: any) {
+        liveError = err?.message || String(err);
       }
-    } catch (err) {
-      console.warn('Live Cloud DLP API call failed, falling back to local DLP engine:', err);
     }
+  } else {
+    liveError = 'No ADC Access Token available';
   }
 
   // Fallback pattern-based DLP engine
@@ -98,7 +121,7 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
     findings.push({
       infoType: 'US_SOCIAL_SECURITY_NUMBER',
       likelihood: 'VERY_LIKELY',
-      mitigation: 'Cloud DLP masked sensitive SSN with synthetic token [US_SOCIAL_SECURITY_NUMBER]',
+      mitigation: 'Tokenized SSN with [US_SOCIAL_SECURITY_NUMBER]',
     });
     sanitized = sanitized.replace(ssnRegex, '[US_SOCIAL_SECURITY_NUMBER]');
   }
@@ -107,7 +130,7 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
     findings.push({
       infoType: 'CREDIT_CARD_NUMBER',
       likelihood: 'VERY_LIKELY',
-      mitigation: 'Cloud DLP masked customer payment card with token [CREDIT_CARD_NUMBER]',
+      mitigation: 'Tokenized Card Number with [CREDIT_CARD_NUMBER]',
     });
     sanitized = sanitized.replace(ccRegex, '[CREDIT_CARD_NUMBER]');
   }
@@ -116,7 +139,7 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
     findings.push({
       infoType: 'EMAIL_ADDRESS',
       likelihood: 'LIKELY',
-      mitigation: 'Cloud DLP masked customer email address with token [EMAIL_ADDRESS]',
+      mitigation: 'Tokenized Email with [EMAIL_ADDRESS]',
     });
     sanitized = sanitized.replace(emailRegex, '[EMAIL_ADDRESS]');
   }
@@ -125,6 +148,11 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
     sanitizedText: sanitized,
     findings,
     isLiveApi: false,
-    latencyMs: Math.max(12, Date.now() - startTime),
+    latencyMs: Date.now() - startTime,
+    apiDetails: {
+      endpoint: `https://dlp.googleapis.com/v2/projects/${projectId}/content:deidentify`,
+      httpStatus: liveHttpStatus || 'FALLBACK_LOCAL',
+      error: liveError || 'Used pattern inspection',
+    },
   };
 }

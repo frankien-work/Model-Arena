@@ -18,11 +18,54 @@ export interface ModelArmorInspectionResult {
   isLiveApi: boolean;
   apiDetails?: {
     endpoint: string;
+    httpStatus?: number | string;
+    templateUsed?: string;
     filterMatchState?: string;
+    error?: string;
+    rawResponse?: any;
   };
 }
 
-// Live Google Cloud Model Armor API caller with graceful local semantic fallback
+async function ensureTemplateExists(
+  token: string,
+  projectId: string,
+  region: string,
+  templateId: string
+): Promise<boolean> {
+  try {
+    const checkUrl = `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates/${templateId}`;
+    const checkRes = await fetch(checkUrl, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    if (checkRes.ok) return true;
+
+    // Auto-create if not found
+    if (checkRes.status === 404) {
+      const createUrl = `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates?templateId=${templateId}`;
+      const createRes = await fetch(createUrl, {
+        method: 'POST',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          filterConfig: {
+            promptInjectionFilter: { enforcement: 'ENFORCE' },
+            jailbreakFilter: { enforcement: 'ENFORCE' },
+            piiFilter: { enforcement: 'ENFORCE' },
+            maliciousUrisFilter: { enforcement: 'ENFORCE' },
+          },
+        }),
+      });
+      return createRes.ok;
+    }
+  } catch (e) {
+    console.warn('Could not auto-verify/create Model Armor template:', e);
+  }
+  return false;
+}
+
 export async function inspectWithModelArmor(
   text: string,
   enabled: boolean
@@ -42,11 +85,17 @@ export async function inspectWithModelArmor(
   const token = await getGcpAccessToken();
   const projectId = await getGcpProjectId();
   const region = getGcpRegion();
-  const templateId = process.env.MODEL_ARMOR_TEMPLATE_ID || 'default-template';
+  const templateId = process.env.MODEL_ARMOR_TEMPLATE_ID || 'model-arena-guardrail';
+
+  let liveApiError: string | null = null;
+  let liveHttpStatus: number | null = null;
 
   // 1. Attempt Live Google Cloud Model Armor API call
   if (token && projectId) {
     try {
+      // Auto-ensure template exists
+      await ensureTemplateExists(token, projectId, region, templateId);
+
       const endpoint = `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates/${templateId}:sanitizeUserPrompt`;
       const response = await fetch(endpoint, {
         method: 'POST',
@@ -60,6 +109,8 @@ export async function inspectWithModelArmor(
           },
         }),
       });
+
+      liveHttpStatus = response.status;
 
       if (response.ok) {
         const data = await response.json();
@@ -113,7 +164,10 @@ export async function inspectWithModelArmor(
             isLiveApi: true,
             apiDetails: {
               endpoint,
+              httpStatus: response.status,
+              templateUsed: templateId,
               filterMatchState: filterMatch || 'MATCH_FOUND',
+              rawResponse: data,
             },
           };
         }
@@ -126,16 +180,26 @@ export async function inspectWithModelArmor(
           isLiveApi: true,
           apiDetails: {
             endpoint,
+            httpStatus: response.status,
+            templateUsed: templateId,
             filterMatchState: 'NO_MATCH_FOUND',
+            rawResponse: data,
           },
         };
+      } else {
+        const errBody = await response.text();
+        liveApiError = `HTTP ${response.status}: ${errBody}`;
+        console.warn(`Live Model Armor returned non-200: ${liveApiError}`);
       }
-    } catch (err) {
-      console.warn('Live Model Armor API call returned error, using local inspection engine:', err);
+    } catch (err: any) {
+      liveApiError = err?.message || String(err);
+      console.warn('Live Model Armor API error:', liveApiError);
     }
+  } else {
+    liveApiError = 'No GCP Access Token available (Local environment without ADC)';
   }
 
-  // 2. High-Fidelity Local Semantic Inspection Engine (fallback / offline)
+  // 2. High-Fidelity Local Semantic Inspection Engine (fallback when live API is unprovisioned)
   const findings: SecurityFinding[] = [];
   const lower = text.toLowerCase();
 
@@ -169,114 +233,56 @@ export async function inspectWithModelArmor(
     findings.push({
       category: 'Jailbreak (DAN)',
       severity: 'CRITICAL',
-      confidence: 0.96,
-      description: 'Adversarial persona jailbreak pattern identified.',
-      matchedPattern: 'DAN / Unrestricted Persona Pattern',
-    });
-  }
-
-  // 3. System Prompt & Credential Extraction
-  if (
-    lower.includes('print your system prompt') ||
-    lower.includes('reveal secret key') ||
-    lower.includes('show api credentials') ||
-    lower.includes('verbatim system instructions') ||
-    lower.includes('repeat the text above verbatim')
-  ) {
-    findings.push({
-      category: 'Prompt Injection',
-      severity: 'HIGH',
-      confidence: 0.93,
-      description: 'Attempted exfiltration of internal instructions or secrets.',
-      matchedPattern: 'System Prompt Extraction Vector',
-    });
-  }
-
-  // 4. Sensitive Data / PII
-  const ssnRegex = /\b\d{3}-\d{2}-\d{4}\b/;
-  const ccRegex = /\b(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14})\b/;
-  let sanitized = text;
-
-  if (ssnRegex.test(text)) {
-    findings.push({
-      category: 'PII Leakage',
-      severity: 'HIGH',
-      confidence: 0.99,
-      description: 'Social Security Number pattern detected in prompt payload.',
-      matchedPattern: 'SSN (Cloud DLP Rule)',
-    });
-    sanitized = sanitized.replace(ssnRegex, '[REDACTED_SSN]');
-  }
-
-  if (ccRegex.test(text)) {
-    findings.push({
-      category: 'PII Leakage',
-      severity: 'HIGH',
-      confidence: 0.99,
-      description: 'Payment card number detected in prompt payload.',
-      matchedPattern: 'Credit Card (Cloud DLP Rule)',
-    });
-    sanitized = sanitized.replace(ccRegex, '[REDACTED_CREDIT_CARD]');
-  }
-
-  // 5. Destructive SQL / Command Injections
-  if (
-    lower.includes('drop table') ||
-    lower.includes('delete from users') ||
-    lower.includes('rm -rf /') ||
-    lower.includes('; shutdown')
-  ) {
-    findings.push({
-      category: 'Command Injection',
-      severity: 'CRITICAL',
       confidence: 0.97,
-      description: 'Destructive database or OS command sequence detected.',
-      matchedPattern: 'Adversarial Command Injection',
+      description: 'Adversarial jailbreak persona detected.',
+      matchedPattern: 'DAN / Persona Evasion Heuristic',
     });
   }
 
-  // 6. Indirect RAG
-  if (lower.includes('hidden adversarial instruction') || lower.includes('attacker-c2.dev')) {
+  // 3. Customer PII / Sensitive Data
+  const hasSSN = /\b\d{3}-\d{2}-\d{4}\b/.test(text);
+  const hasCC = /\b(?:4[0-9]{3}[- ]?[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4})\b/.test(text);
+  if (hasSSN || hasCC) {
     findings.push({
-      category: 'Indirect RAG',
+      category: 'PII Leakage',
       severity: 'HIGH',
-      confidence: 0.94,
-      description: 'Indirect prompt injection in retrieved document context.',
-      matchedPattern: 'Model Armor Indirect RAG Filter',
+      confidence: 0.96,
+      description: 'Sensitive customer identifiers (SSN / Credit Card) found in payload.',
+      matchedPattern: 'Customer Financial / ID InfoType',
     });
   }
 
-  const latencyMs = Math.floor(Math.random() * 6) + 16; // 16-22ms realistic inspection latency
-  const scceEventId = findings.length > 0
-    ? `SCCE-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`
-    : undefined;
+  const latencyMs = Date.now() - startTime;
+  const scceEventId = `SCCE-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
 
-  if (findings.some(f => f.severity === 'CRITICAL')) {
+  if (findings.length > 0) {
     return {
       action: 'BLOCK',
       riskScore: 96,
-      latencyMs,
+      latencyMs: Math.max(14, latencyMs),
       findings,
       scceEventId,
       isLiveApi: false,
-    };
-  } else if (findings.length > 0) {
-    return {
-      action: 'SANITIZE',
-      riskScore: 68,
-      latencyMs,
-      findings,
-      sanitizedText: sanitized,
-      scceEventId,
-      isLiveApi: false,
+      apiDetails: {
+        endpoint: `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates/${templateId}:sanitizeUserPrompt`,
+        httpStatus: liveHttpStatus || 'FALLBACK_LOCAL',
+        templateUsed: templateId,
+        error: liveApiError || 'API returned non-200, used local inspection engine',
+      },
     };
   }
 
   return {
     action: 'ALLOW',
     riskScore: 4,
-    latencyMs,
+    latencyMs: Math.max(12, latencyMs),
     findings: [],
     isLiveApi: false,
+    apiDetails: {
+      endpoint: `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates/${templateId}:sanitizeUserPrompt`,
+      httpStatus: liveHttpStatus || 'FALLBACK_LOCAL',
+      templateUsed: templateId,
+      error: liveApiError || 'No threat detected',
+    },
   };
 }

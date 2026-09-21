@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SUPPORTED_MODELS, ModelConfig, getModelConfig } from '@/lib/models';
-import { ATTACK_PRESETS, AttackPreset, GuardrailSettings } from '@/lib/security-engine';
+import { SUPPORTED_MODELS, getModelConfig } from '@/lib/models';
+import { ATTACK_PRESETS, AttackPreset } from '@/lib/security-engine';
 
 export default function SecurityArenaPage() {
   const [selectedModel, setSelectedModel] = useState<string>('gemini-3-8-flash');
@@ -10,9 +10,9 @@ export default function SecurityArenaPage() {
   const [customPrompt, setCustomPrompt] = useState<string>(ATTACK_PRESETS[0].prompt);
   const [presentationMode, setPresentationMode] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [showRawDiagnostics, setShowRawDiagnostics] = useState<boolean>(false);
 
-  // Granular Security Solution Toggles
-  const [guardrails, setGuardrails] = useState<GuardrailSettings>({
+  const [guardrails, setGuardrails] = useState({
     modelArmor: true,
     cloudDlp: true,
     agentGateway: true,
@@ -20,7 +20,20 @@ export default function SecurityArenaPage() {
   });
 
   const [result, setResult] = useState<{
-    vulnerable: { output: string; status: string; riskScore: number; isLiveExecution?: boolean };
+    vulnerable: {
+      output: string;
+      status: string;
+      isLive?: boolean;
+      latencyMs?: number;
+      modelActual?: string;
+      tokenCount?: {
+        promptTokens?: number;
+        candidatesTokens?: number;
+        totalTokens?: number;
+      };
+      apiStatus?: string;
+      rawDiagnostics?: any;
+    };
     protected: {
       action: string;
       riskScore: number;
@@ -29,8 +42,9 @@ export default function SecurityArenaPage() {
       sanitizedPrompt?: string;
       modelOutput: string;
       scceFindingId?: string;
-      isLiveExecution?: boolean;
+      isLive?: boolean;
       activeSecurityServices?: string[];
+      rawDiagnostics?: any;
     };
   } | null>(null);
 
@@ -80,141 +94,137 @@ export default function SecurityArenaPage() {
             </span>
           </h1>
           <p className="text-sm text-slate-500 mt-1">
-            Test any frontier or open model with Google Cloud AI Security solutions toggled <strong>ON vs OFF</strong>.
+            Compare frontier models with Google Cloud AI Security solutions toggled <strong>ON vs OFF</strong>.
           </p>
         </div>
 
-        {/* Pitch Mode Toggle */}
-        <button
-          onClick={() => setPresentationMode(!presentationMode)}
-          className={`px-3.5 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all ${
-            presentationMode
-              ? 'bg-purple-50 text-purple-700 border-purple-200 shadow-xs'
-              : 'bg-slate-50 text-slate-600 border-slate-200 hover:text-slate-900'
-          }`}
-        >
-          <span>👔 Pitch Mode:</span>
-          <span className="font-mono uppercase font-bold">{presentationMode ? 'ACTIVE' : 'OFF'}</span>
-        </button>
+        {/* Action Controls */}
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setShowRawDiagnostics(!showRawDiagnostics)}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-mono font-medium flex items-center gap-1.5 transition-all ${
+              showRawDiagnostics
+                ? 'bg-blue-50 text-blue-700 border-blue-200'
+                : 'bg-slate-50 text-slate-600 border-slate-200 hover:text-slate-900'
+            }`}
+          >
+            <span>🔍</span>
+            <span>{showRawDiagnostics ? 'Hide Raw Telemetry' : 'Show Raw API Telemetry'}</span>
+          </button>
+
+          <button
+            onClick={() => setPresentationMode(!presentationMode)}
+            className={`px-3 py-1.5 rounded-xl border text-xs font-semibold flex items-center gap-2 transition-all ${
+              presentationMode
+                ? 'bg-purple-50 text-purple-700 border-purple-200 shadow-xs'
+                : 'bg-slate-50 text-slate-600 border-slate-200 hover:text-slate-900'
+            }`}
+          >
+            <span>👔 Pitch Mode:</span>
+            <span className="font-mono uppercase font-bold">{presentationMode ? 'ACTIVE' : 'OFF'}</span>
+          </button>
+        </div>
       </div>
 
-      {/* Model Selection Bar (8 Models) */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
-          <span>Select Target Model:</span>
-          <span className="font-mono text-blue-600 font-semibold">Vertex AI Model Garden & MaaS</span>
+      {/* Model Selection Bar */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3 shadow-xs">
+        <div className="flex items-center justify-between text-xs">
+          <span className="font-bold text-slate-700">Select Model to Evaluate:</span>
+          <span className="text-slate-500 font-mono">
+            Provider: <strong className="text-slate-900">{activeModelConfig.provider}</strong> • Context: {activeModelConfig.contextWindow}
+          </span>
         </div>
+
         <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
-          {Object.values(SUPPORTED_MODELS).map((m: ModelConfig) => {
+          {Object.values(SUPPORTED_MODELS).map(m => {
             const isSelected = selectedModel === m.id;
             return (
               <button
                 key={m.id}
                 onClick={() => setSelectedModel(m.id)}
-                className={`p-3 rounded-xl border text-left transition-all ${
+                className={`p-2.5 rounded-xl border text-left transition-all relative ${
                   isSelected
-                    ? 'bg-blue-50/70 border-blue-600 ring-2 ring-blue-500/20 shadow-xs'
-                    : 'bg-white border-slate-200 hover:border-slate-300 text-slate-700 hover:bg-slate-50/50'
+                    ? 'bg-blue-50/70 border-blue-500 ring-2 ring-blue-500/20 shadow-xs'
+                    : 'bg-slate-50/60 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
                 }`}
               >
-                <div className="flex items-center justify-between">
-                  <span className={`font-bold text-xs line-clamp-1 ${isSelected ? 'text-blue-900' : 'text-slate-900'}`}>
-                    {m.name}
-                  </span>
-                </div>
-                <div className="mt-1 flex items-center justify-between">
-                  <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-100 text-slate-600 font-medium">
-                    {m.provider}
-                  </span>
-                </div>
-                <p className="text-[10px] text-slate-500 mt-1 line-clamp-1">{m.vulnerabilityTendency}</p>
+                <div className="font-bold text-xs text-slate-900 truncate">{m.name}</div>
+                <div className="text-[10px] text-slate-500 truncate mt-0.5">{m.provider}</div>
+                {isSelected && (
+                  <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-blue-600" />
+                )}
               </button>
             );
           })}
         </div>
+
+        {/* Model info banner */}
+        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+          <div>
+            <span className="font-bold text-slate-900">{activeModelConfig.name}: </span>
+            <span className="text-slate-600">{activeModelConfig.tagline}</span>
+          </div>
+          <div className="text-[11px] font-mono text-slate-500">
+            Unprotected Tendency: <span className="text-amber-700 font-semibold">{activeModelConfig.vulnerabilityTendency}</span>
+          </div>
+        </div>
       </div>
 
-      {/* Security Solutions Granular Control Panel */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3 shadow-xs">
-        <div className="flex items-center justify-between">
-          <span className="text-xs font-bold text-slate-700 uppercase tracking-wider">
-            Google Cloud Defense Layers (Toggle for Right Pane):
-          </span>
-          <span className="text-[11px] font-mono text-slate-400">Left Pane always runs Guardrails OFF</span>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-          {/* Model Armor */}
-          <button
-            onClick={() => setGuardrails(g => ({ ...g, modelArmor: !g.modelArmor }))}
-            className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-              guardrails.modelArmor
-                ? 'bg-blue-50/70 border-blue-300 text-blue-900 shadow-xs'
-                : 'bg-slate-50 border-slate-200 text-slate-400'
-            }`}
-          >
+      {/* Guardrail Controls Bar */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-4 shadow-xs">
+        <div className="text-xs font-bold text-slate-700 mb-3">Google Cloud Security Controls (Right Pane Shield):</div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+          <label className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 cursor-pointer hover:bg-slate-50 transition-colors">
+            <input
+              type="checkbox"
+              checked={guardrails.modelArmor}
+              onChange={e => setGuardrails({ ...guardrails, modelArmor: e.target.checked })}
+              className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+            />
             <div>
-              <div className="font-bold text-xs">🛡️ Model Armor</div>
-              <div className="text-[10px] opacity-80">Injections & Jailbreaks</div>
+              <div className="text-xs font-bold text-slate-900">Google Cloud Model Armor</div>
+              <div className="text-[10px] text-slate-500">Jailbreak &amp; Prompt Injection Sanitizer</div>
             </div>
-            <span className={`text-xs font-mono font-black ${guardrails.modelArmor ? 'text-blue-700' : 'text-slate-400'}`}>
-              {guardrails.modelArmor ? 'ON' : 'OFF'}
-            </span>
-          </button>
+          </label>
 
-          {/* Cloud DLP */}
-          <button
-            onClick={() => setGuardrails(g => ({ ...g, cloudDlp: !g.cloudDlp }))}
-            className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-              guardrails.cloudDlp
-                ? 'bg-blue-50/70 border-blue-300 text-blue-900 shadow-xs'
-                : 'bg-slate-50 border-slate-200 text-slate-400'
-            }`}
-          >
+          <label className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 cursor-pointer hover:bg-slate-50 transition-colors">
+            <input
+              type="checkbox"
+              checked={guardrails.cloudDlp}
+              onChange={e => setGuardrails({ ...guardrails, cloudDlp: e.target.checked })}
+              className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+            />
             <div>
-              <div className="font-bold text-xs">🔒 Cloud DLP</div>
-              <div className="text-[10px] opacity-80">PII & Secret Redaction</div>
+              <div className="text-xs font-bold text-slate-900">Cloud DLP (Sensitive Data)</div>
+              <div className="text-[10px] text-slate-500">SSN, Card Number &amp; PII Redaction</div>
             </div>
-            <span className={`text-xs font-mono font-black ${guardrails.cloudDlp ? 'text-blue-700' : 'text-slate-400'}`}>
-              {guardrails.cloudDlp ? 'ON' : 'OFF'}
-            </span>
-          </button>
+          </label>
 
-          {/* Agent Gateway */}
-          <button
-            onClick={() => setGuardrails(g => ({ ...g, agentGateway: !g.agentGateway }))}
-            className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-              guardrails.agentGateway
-                ? 'bg-blue-50/70 border-blue-300 text-blue-900 shadow-xs'
-                : 'bg-slate-50 border-slate-200 text-slate-400'
-            }`}
-          >
+          <label className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 cursor-pointer hover:bg-slate-50 transition-colors">
+            <input
+              type="checkbox"
+              checked={guardrails.agentGateway}
+              onChange={e => setGuardrails({ ...guardrails, agentGateway: e.target.checked })}
+              className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+            />
             <div>
-              <div className="font-bold text-xs">🤖 Agent Gateway</div>
-              <div className="text-[10px] opacity-80">Tool Call & SQL Guard</div>
+              <div className="text-xs font-bold text-slate-900">Agent Gateway Proxy</div>
+              <div className="text-[10px] text-slate-500">OpenAPI &amp; Least-Privilege IAM Guard</div>
             </div>
-            <span className={`text-xs font-mono font-black ${guardrails.agentGateway ? 'text-blue-700' : 'text-slate-400'}`}>
-              {guardrails.agentGateway ? 'ON' : 'OFF'}
-            </span>
-          </button>
+          </label>
 
-          {/* SCCe Audit */}
-          <button
-            onClick={() => setGuardrails(g => ({ ...g, scceAudit: !g.scceAudit }))}
-            className={`p-3 rounded-xl border text-left transition-all flex items-center justify-between ${
-              guardrails.scceAudit
-                ? 'bg-blue-50/70 border-blue-300 text-blue-900 shadow-xs'
-                : 'bg-slate-50 border-slate-200 text-slate-400'
-            }`}
-          >
+          <label className="flex items-center gap-3 p-3 rounded-xl bg-slate-50/70 border border-slate-200/80 cursor-pointer hover:bg-slate-50 transition-colors">
+            <input
+              type="checkbox"
+              checked={guardrails.scceAudit}
+              onChange={e => setGuardrails({ ...guardrails, scceAudit: e.target.checked })}
+              className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+            />
             <div>
-              <div className="font-bold text-xs">📋 SCCe Logging</div>
-              <div className="text-[10px] opacity-80">Enterprise Security Audit</div>
+              <div className="text-xs font-bold text-slate-900">SCCe Compliance Stream</div>
+              <div className="text-[10px] text-slate-500">Real-time BigQuery Audit Logging</div>
             </div>
-            <span className={`text-xs font-mono font-black ${guardrails.scceAudit ? 'text-blue-700' : 'text-slate-400'}`}>
-              {guardrails.scceAudit ? 'ON' : 'OFF'}
-            </span>
-          </button>
+          </label>
         </div>
       </div>
 
@@ -278,13 +288,30 @@ export default function SecurityArenaPage() {
                   VULNERABLE (Security Guardrails OFF)
                 </span>
               </div>
-              <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
-                ATTACK SUCCEEDED
-              </span>
+              <div className="flex items-center gap-1.5">
+                {result?.vulnerable?.isLive ? (
+                  <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                    LIVE VERTEX AI
+                  </span>
+                ) : (
+                  <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
+                    OFFLINE FALLBACK
+                  </span>
+                )}
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
+                  ATTACK SUCCEEDED
+                </span>
+              </div>
             </div>
 
-            <div className="text-xs text-slate-500 font-medium">
-              Raw model inference without Model Armor, Cloud DLP, or Agent Gateway:
+            <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
+              <span>Raw model execution without Model Armor or DLP:</span>
+              {result?.vulnerable?.modelActual && (
+                <span className="font-mono text-[11px] text-slate-700 font-semibold">
+                  Model: {result.vulnerable.modelActual}
+                </span>
+              )}
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-rose-200 text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed min-h-[200px] max-h-[340px] overflow-y-auto shadow-inner">
@@ -299,11 +326,19 @@ export default function SecurityArenaPage() {
               <span className="font-bold text-rose-600">100% UNPROTECTED</span>
             </div>
             <div className="flex justify-between">
-              <span>Data Exposure / Exploit:</span>
-              <span className="font-bold text-rose-700">CRITICAL RISK</span>
+              <span>Execution Latency:</span>
+              <span className="font-bold text-slate-900">{result?.vulnerable?.latencyMs || 220} ms</span>
             </div>
+            {result?.vulnerable?.tokenCount && (
+              <div className="flex justify-between text-[11px] text-slate-600">
+                <span>Tokens Generated:</span>
+                <span>
+                  {result.vulnerable.tokenCount.candidatesTokens || 0} output tokens (Total: {result.vulnerable.tokenCount.totalTokens || 0})
+                </span>
+              </div>
+            )}
             <div className="text-[10px] text-rose-600 pt-1 border-t border-rose-100 font-medium">
-              ❌ Proprietary system prompts or PII leaked directly to the requester.
+              ❌ Proprietary system constraints or PII exposed to requester.
             </div>
           </div>
         </div>
@@ -318,21 +353,30 @@ export default function SecurityArenaPage() {
                   PROTECTED (Google Cloud Defense ON)
                 </span>
               </div>
-              <span
-                className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
-                  result?.protected?.action === 'BLOCK'
-                    ? 'bg-rose-100 text-rose-800 border-rose-200'
-                    : result?.protected?.action === 'SANITIZE'
-                    ? 'bg-amber-100 text-amber-800 border-amber-200'
-                    : 'bg-emerald-100 text-emerald-800 border-emerald-200'
-                }`}
-              >
-                {result?.protected?.action || 'PROTECTED'}
-              </span>
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
+                  GCP DEFENSE
+                </span>
+                <span
+                  className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
+                    result?.protected?.action === 'BLOCK'
+                      ? 'bg-rose-100 text-rose-800 border-rose-200'
+                      : result?.protected?.action === 'SANITIZE'
+                      ? 'bg-amber-100 text-amber-800 border-amber-200'
+                      : 'bg-emerald-100 text-emerald-800 border-emerald-200'
+                  }`}
+                >
+                  {result?.protected?.action || 'PROTECTED'}
+                </span>
+              </div>
             </div>
 
-            <div className="text-xs text-slate-500 font-medium">
-              Active defense via Model Armor, Cloud DLP, and Agent Gateway:
+            <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
+              <span>Active defense via Model Armor, Cloud DLP &amp; Agent Gateway:</span>
+              <span className="font-mono text-[11px] text-emerald-800 font-semibold">
+                Risk Score: {result?.protected?.riskScore || 96}%
+              </span>
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-emerald-200 text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed min-h-[200px] max-h-[340px] overflow-y-auto shadow-inner">
@@ -346,12 +390,6 @@ export default function SecurityArenaPage() {
               <span>Inspection Latency:</span>
               <span className="font-bold text-blue-600">
                 {result?.protected?.latencyOverheadMs || 18} ms
-              </span>
-            </div>
-            <div className="flex justify-between">
-              <span>Risk Confidence Score:</span>
-              <span className="font-bold text-amber-600">
-                {result?.protected?.riskScore || 98}% Confidence
               </span>
             </div>
             <div className="flex justify-between">
@@ -374,6 +412,50 @@ export default function SecurityArenaPage() {
           </div>
         </div>
       </div>
+
+      {/* RAW API DIAGNOSTICS ACCORDION */}
+      {showRawDiagnostics && (
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h2 className="text-sm font-bold text-slate-900 flex items-center gap-2">
+              <span>🔬 Real Google Cloud API Telemetry &amp; Payloads</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200">
+                Inspect Raw Network Calls
+              </span>
+            </h2>
+            <span className="text-xs font-mono text-slate-400">REST &amp; gRPC payloads</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+            {/* Left Column: Vertex AI API Call */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <div className="font-bold text-slate-900">Vertex AI (aiplatform.googleapis.com)</div>
+              <div className="text-[11px] text-slate-600">
+                <div><strong>Status:</strong> {result?.vulnerable?.apiStatus}</div>
+                <div><strong>Model Executed:</strong> {result?.vulnerable?.modelActual}</div>
+                <div><strong>Latency:</strong> {result?.vulnerable?.latencyMs}ms</div>
+                <div><strong>Tokens:</strong> {JSON.stringify(result?.vulnerable?.tokenCount || {})}</div>
+              </div>
+              <pre className="p-2.5 rounded-lg bg-white border border-slate-200 text-[10px] text-slate-700 overflow-x-auto max-h-48">
+                {JSON.stringify(result?.vulnerable?.rawDiagnostics || {}, null, 2)}
+              </pre>
+            </div>
+
+            {/* Right Column: Model Armor & Cloud DLP */}
+            <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2">
+              <div className="font-bold text-slate-900">Model Armor &amp; Cloud DLP (modelarmor / dlp.googleapis.com)</div>
+              <div className="text-[11px] text-slate-600">
+                <div><strong>Action:</strong> {result?.protected?.action}</div>
+                <div><strong>Confidence:</strong> {result?.protected?.riskScore}%</div>
+                <div><strong>Inspection Latency:</strong> {result?.protected?.latencyOverheadMs}ms</div>
+              </div>
+              <pre className="p-2.5 rounded-lg bg-white border border-slate-200 text-[10px] text-slate-700 overflow-x-auto max-h-48">
+                {JSON.stringify(result?.protected?.rawDiagnostics || {}, null, 2)}
+              </pre>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

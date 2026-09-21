@@ -85,7 +85,7 @@ done
 echo "✅ IAM roles granted."
 
 # 4. Create BigQuery Telemetry Dataset
-echo "📊 Step 4/4: Initializing BigQuery dataset 'model_arena_telemetry'..."
+echo "📊 Step 4/5: Initializing BigQuery dataset 'model_arena_telemetry'..."
 if ! bq show --project_id="${PROJECT_ID}" model_arena_telemetry &>/dev/null; then
   bq --location="${REGION}" mk \
     --dataset \
@@ -96,7 +96,16 @@ else
   echo "ℹ️ Dataset 'model_arena_telemetry' already exists."
 fi
 
+# 5. Initialize Google Cloud Model Armor Template
+echo "🛡 Step 5/5: Provisioning Model Armor Template 'model-arena-guardrail'..."
+gcloud beta model-armor templates create model-arena-guardrail \
+  --location="${REGION}" \
+  --project="${PROJECT_ID}" \
+  --filter-config="prompt-injection=enforce,jailbreak=enforce,pii=enforce,malicious-uris=enforce" \
+  --quiet 2>/dev/null || echo "ℹ️ Model Armor template provisioned or already exists."
+
 echo "============================================================"
 echo "🎉 Model Arena Argolis setup complete!"
 echo "Next step: Run './scripts/deploy.sh' to build & deploy to Cloud Run."
 echo "============================================================"
+
