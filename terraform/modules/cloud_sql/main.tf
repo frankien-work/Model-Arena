@@ -12,7 +12,7 @@ variable "region" { type = string }
 variable "tier" { type = string; default = "db-f1-micro" }
 
 resource "google_sql_database_instance" "postgres" {
-  name             = "mode-arena-db"
+  name             = "model-arena-db"
   project          = var.project_id
   region           = var.region
   database_version = "POSTGRES_15"
@@ -39,7 +39,7 @@ resource "google_sql_database_instance" "postgres" {
 }
 
 resource "google_sql_database" "database" {
-  name     = "mode_arena"
+  name     = "model_arena"
   project  = var.project_id
   instance = google_sql_database_instance.postgres.name
 }

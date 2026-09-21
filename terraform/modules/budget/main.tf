@@ -11,10 +11,10 @@ variable "project_id" { type = string }
 variable "billing_account_id" { type = string }
 variable "monthly_budget_ceiling" { type = number; default = 600 }
 
-resource "google_billing_budget" "mode_arena_budget" {
+resource "google_billing_budget" "model_arena_budget" {
   count           = var.billing_account_id != "" ? 1 : 0
   billing_account = var.billing_account_id
-  display_name    = "Mode Arena Sandbox Monthly Spend Guardrail"
+  display_name    = "Model Arena Sandbox Monthly Spend Guardrail"
 
   budget_filter {
     projects = ["projects/${var.project_id}"]

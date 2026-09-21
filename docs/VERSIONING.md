@@ -1,4 +1,4 @@
-# Mode Arena Versioning & Release Strategy 🏷
+# Model Arena Versioning & Release Strategy 🏷
 
 This project strictly adheres to **[Semantic Versioning 2.0.0](https://semver.org/)** (`MAJOR.MINOR.PATCH`).
 
@@ -39,7 +39,7 @@ gitGraph
 ### Release Tagging
 Every production release to Cloud Run must be tagged in Git:
 ```bash
-git tag -a v1.0.0 -m "Release v1.0.0: Initial Mode Arena launch"
+git tag -a v1.0.0 -m "Release v1.0.0: Initial Model Arena launch"
 git push origin v1.0.0
 ```
 
@@ -47,6 +47,6 @@ git push origin v1.0.0
 
 ## 3. Compatibility Matrix
 
-| Mode Arena Version | Next.js | Node.js | Google Cloud SDK | Terraform | Postgres (pgvector) |
+| Model Arena Version | Next.js | Node.js | Google Cloud SDK | Terraform | Postgres (pgvector) |
 | :--- | :--- | :--- | :--- | :--- | :--- |
 | **v1.0.0** | 14 / 15 | >= 20.x | >= 490.x | >= 1.5.x | PostgreSQL 15 |

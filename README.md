@@ -1,4 +1,4 @@
-# Mode Arena ⚡️
+# Model Arena ⚡️
 
 > **Enterprise-Grade GenAI Evaluation, Model Armor Security & Multi-Model Benchmarking Platform**  
 > *Built for Google Cloud Sales Engineers (CEs/SEs) & Account Managers (AMs) partnering with Series A/B Startups.*
@@ -21,7 +21,7 @@ Fast-moving Series A and Series B startups make architectural decisions at break
 2. **AI Security & Guardrails:** *"How do we prevent prompt injection, jailbreaks, and PII leakage without building complex custom safety filters from scratch?"*
 3. **Data Modernization & Cost:** *"Can we keep our relational PostgreSQL database, use vector search (`pgvector`), and stream real-time telemetry into BigQuery without massive infrastructure bills?"*
 
-**Mode Arena** is a live, cloud-native showcase answering these exact questions. It runs in an **Argolis** test environment, strictly adheres to a **<$600/month budget ceiling**, and serves as both an interactive customer pitch tool and a living technical blueprint.
+**Model Arena** is a live, cloud-native showcase answering these exact questions. It runs in an **Argolis** test environment, strictly adheres to a **<$600/month budget ceiling**, and serves as both an interactive customer pitch tool and a living technical blueprint.
 
 ---
 
@@ -92,7 +92,7 @@ flowchart TB
 
 ## 💰 Cost Optimization & Budget Guardrails
 
-Mode Arena is specifically architected to run well under **$600/month** (typically **$75 – $190/month** for active demo usage, and **~$8 – $15/month** when idle):
+Model Arena is specifically architected to run well under **$600/month** (typically **$75 – $190/month** for active demo usage, and **~$8 – $15/month** when idle):
 
 | Service | Strategy | Idle Cost | Active Pitch Cost |
 | :--- | :--- | :--- | :--- |

@@ -104,7 +104,7 @@ export default function DocsPage() {
       {/* Tab 2: Roadmap */}
       {activeTab === 'roadmap' && (
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-6 space-y-4">
-          <h2 className="text-lg font-bold text-white">Mode Arena Quarterly Roadmap</h2>
+          <h2 className="text-lg font-bold text-white">Model Arena Quarterly Roadmap</h2>
           <div className="space-y-3">
             <div className="p-4 rounded-xl bg-slate-950/60 border border-emerald-500/30 space-y-1">
               <div className="flex items-center justify-between">

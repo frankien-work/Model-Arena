@@ -3,7 +3,7 @@ import './globals.css';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Mode Arena ⚡️ | Google Cloud GenAI & Security Sandbox',
+  title: 'Model Arena ⚡️ | Google Cloud GenAI & Security Sandbox',
   description: 'Enterprise-grade GenAI Evaluation, Model Armor Security, and Multi-Model Benchmarking for Google Cloud Sales Engineers and Account Managers.',
 };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
                 </div>
                 <div>
                   <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                    Mode Arena
+                    Model Arena
                   </span>
                   <span className="ml-1.5 text-xs font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
                     Argolis
@@ -96,7 +96,7 @@ export default function RootLayout({
         <footer className="border-t border-slate-800/60 bg-[#070a12] py-4 text-xs text-slate-500">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div>
-              <span>Mode Arena v1.0.0 • Built for Google Cloud Sales Engineering & Account Managers</span>
+              <span>Model Arena v1.0.0 • Built for Google Cloud Sales Engineering & Account Managers</span>
             </div>
             <div className="flex items-center gap-4">
               <Link href="/docs" className="hover:text-slate-300 transition-colors">Documentation</Link>

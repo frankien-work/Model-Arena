@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Mode Arena - Cloud SQL Cost Guardrail: Pause & Resume Script
+# Model Arena - Cloud SQL Cost Guardrail: Pause & Resume Script
 # Usage:
 #   ./scripts/toggle-cloud-sql.sh pause   # Stops the instance (stops compute billing)
 #   ./scripts/toggle-cloud-sql.sh resume  # Starts the instance (readies for demo)
@@ -9,7 +9,7 @@
 
 set -euo pipefail
 
-INSTANCE_NAME="${CLOUD_SQL_INSTANCE:-mode-arena-db}"
+INSTANCE_NAME="${CLOUD_SQL_INSTANCE:-model-arena-db}"
 PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo "")}"
 
 if [[ -z "${PROJECT_ID}" ]]; then
@@ -21,7 +21,7 @@ fi
 ACTION="${1:-status}"
 
 echo "============================================================"
-echo "⚡️ Mode Arena: Cloud SQL Cost Guardrail"
+echo "⚡️ Model Arena: Cloud SQL Cost Guardrail"
 echo "Project:   ${PROJECT_ID}"
 echo "Instance:  ${INSTANCE_NAME}"
 echo "Action:    ${ACTION}"

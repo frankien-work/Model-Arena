@@ -1,4 +1,4 @@
-# Mode Arena: SE & AM Demo Guide 🎤
+# Model Arena: SE & AM Demo Guide 🎤
 
 This guide provides step-by-step presentation scripts for **Sales Engineers (SEs)** and **Account Managers (AMs)** conducting live customer demonstrations with startup founders, CTOs, and technical architects.
 
@@ -10,7 +10,7 @@ This guide provides step-by-step presentation scripts for **Sales Engineers (SEs
 **Goal:** Prove that Google Cloud offers the fastest, most cost-effective frontier models with enterprise-grade security out of the box.
 
 ### Step 1: Set the Stage (1 min)
-1. Open Mode Arena in your browser.
+1. Open Model Arena in your browser.
 2. Click **"Presentation Mode"** in the top right corner.
 3. **Say:**  
    > *"Most fast-moving startups tell us they don't want to be locked into a single model. You want the flexibility to use Gemini for massive context windows, Claude for deep code reasoning, and open models like Llama—all within a single, secure cloud perimeter. Today I'll show you how Google Cloud makes that frictionless."*

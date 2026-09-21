@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Mode Arena - Automated Cloud Run Deployment Script
+# Model Arena - Automated Cloud Run Deployment Script
 # Usage:
 #   ./scripts/deploy.sh [--project-id PROJECT_ID] [--region REGION]
 # ==============================================================================
@@ -9,7 +9,7 @@ set -euo pipefail
 
 PROJECT_ID="${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo "")}"
 REGION="${GCP_REGION:-us-central1}"
-SERVICE_NAME="mode-arena"
+SERVICE_NAME="model-arena"
 
 # Parse optional arguments
 while [[ $# -gt 0 ]]; do
@@ -35,7 +35,7 @@ if [[ -z "${PROJECT_ID}" ]]; then
 fi
 
 echo "============================================================"
-echo "⚡️ Deploying Mode Arena to Google Cloud Run"
+echo "⚡️ Deploying Model Arena to Google Cloud Run"
 echo "Project:  ${PROJECT_ID}"
 echo "Region:   ${REGION}"
 echo "Service:  ${SERVICE_NAME}"
@@ -44,7 +44,7 @@ echo "============================================================"
 # Navigate to project root
 cd "$(dirname "$0")/.."
 
-SA_EMAIL="mode-arena-sa@${PROJECT_ID}.iam.gserviceaccount.com"
+SA_EMAIL="model-arena-sa@${PROJECT_ID}.iam.gserviceaccount.com"
 
 echo "🚀 Building container and deploying to Cloud Run..."
 gcloud run deploy "${SERVICE_NAME}" \
@@ -65,6 +65,6 @@ gcloud run deploy "${SERVICE_NAME}" \
 
 echo "============================================================"
 URL=$(gcloud run services describe "${SERVICE_NAME}" --project="${PROJECT_ID}" --region="${REGION}" --format="value(status.url)")
-echo "🎉 Mode Arena is live on Cloud Run!"
+echo "🎉 Model Arena is live on Cloud Run!"
 echo "🌐 URL: ${URL}"
 echo "============================================================"

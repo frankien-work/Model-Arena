@@ -1,6 +1,6 @@
-# Mode Arena Features & Sales Battlecards ⚡️
+# Model Arena Features & Sales Battlecards ⚡️
 
-This document catalogs every capability of **Mode Arena**, complete with technical explanations, value propositions, and **Sales Engineering (SE) / Account Manager (AM) battlecards** tailored for startup pitches.
+This document catalogs every capability of **Model Arena**, complete with technical explanations, value propositions, and **Sales Engineering (SE) / Account Manager (AM) battlecards** tailored for startup pitches.
 
 ---
 
@@ -39,7 +39,7 @@ This document catalogs every capability of **Mode Arena**, complete with technic
   - Semantic caching demo: Shows startups how caching near-identical prompts can cut their LLM API spend by 30–50%.
 
 ### 1.4 BigQuery Telemetry & Cost Analytics
-- **What it does:** Streams every benchmark invocation into a BigQuery dataset (`mode_arena_telemetry`).
+- **What it does:** Streams every benchmark invocation into a BigQuery dataset (`model_arena_telemetry`).
 - **Capabilities:**
   - Real-time cost accumulation by model, user, and day.
   - Latency P50, P95, and P99 distribution calculations.

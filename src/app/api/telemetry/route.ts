@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server';
 export const runtime = 'nodejs';
 
 export async function GET() {
-  // Returns aggregated BigQuery telemetry statistics for Mode Arena
+  // Returns aggregated BigQuery telemetry statistics for Model Arena
   return NextResponse.json({
     summary: {
       totalBenchmarkRuns: 1420,

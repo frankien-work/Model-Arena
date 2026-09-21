@@ -1,12 +1,12 @@
-# Mode Arena System Architecture 🏛
+# Model Arena System Architecture 🏛
 
-This document provides a comprehensive technical architecture of **Mode Arena**, detailing the components, data flows, security posture, and Google Cloud Platform (GCP) services used throughout the platform.
+This document provides a comprehensive technical architecture of **Model Arena**, detailing the components, data flows, security posture, and Google Cloud Platform (GCP) services used throughout the platform.
 
 ---
 
 ## 1. High-Level Architecture
 
-Mode Arena implements a modern **Serverless Event-Driven Architecture** deployed on Google Cloud. It combines real-time streaming AI inference, automated prompt security inspection, relational vector search, and analytical telemetry.
+Model Arena implements a modern **Serverless Event-Driven Architecture** deployed on Google Cloud. It combines real-time streaming AI inference, automated prompt security inspection, relational vector search, and analytical telemetry.
 
 ```mermaid
 flowchart TB
@@ -86,10 +86,10 @@ flowchart TB
 - **Hosting:** Next.js full-stack container running on Cloud Run.
 - **Scale-to-Zero:** Configured with `min_instances = 0` and `max_instances = 5` to ensure $0 idle compute cost while preventing runaway concurrent traffic.
 - **Protocol:** HTTP/2 with Server-Sent Events (SSE) for sub-100ms streaming token delivery.
-- **Service Account:** Dedicated least-privilege service account (`mode-arena-sa@PROJECT.iam.gserviceaccount.com`).
+- **Service Account:** Dedicated least-privilege service account (`model-arena-sa@PROJECT.iam.gserviceaccount.com`).
 
 ### 2.2 Model Orchestration: Vertex AI Model Garden
-Mode Arena abstracts diverse AI models behind a unified interface:
+Model Arena abstracts diverse AI models behind a unified interface:
 - **Google Gemini 2.0 Flash & Gemini 1.5 Pro:** First-party frontier models with ultra-low latency, multimodal capabilities, and massive context windows (up to 2M tokens).
 - **Anthropic Claude 3.5 Sonnet (Vertex Partner Model):** Served directly inside the GCP security perimeter via Vertex AI Models-as-a-Service (MaaS).
 - **Meta Llama 3.3 70B & Gemma 2:** Open-weight models deployed via Vertex AI Model Garden endpoints.
@@ -110,12 +110,12 @@ Mode Arena abstracts diverse AI models behind a unified interface:
   - Instance sizing: `db-f1-micro` or `db-g1-small` with automated pause/resume scripts to cap monthly cost at ~$10–$25.
   - Extension: `pgvector` for storing 768-dim prompt embeddings and executing cosine similarity search (`<->` operator with HNSW index).
 - **BigQuery (On-Demand):**
-  - Dataset: `mode_arena_telemetry`.
+  - Dataset: `model_arena_telemetry`.
   - Tables: `benchmark_runs`, `model_latency_metrics`, `security_incidents`.
   - Partitioning: Partitioned by Day (`_PARTITIONDATE`) and clustered by `model_id`.
   - Cost: Free tier covers first 1 TB of queries per month.
 - **Cloud Storage (GCS):**
-  - Bucket: `gs://mode-arena-datasets-${PROJECT_ID}`.
+  - Bucket: `gs://model-arena-datasets-${PROJECT_ID}`.
   - Stores static benchmark prompt suites (JSONL/CSV) and exportable customer presentation summaries.
 
 ---
@@ -174,7 +174,7 @@ sequenceDiagram
 
 ## 5. Architectural Trade-Offs & Decisions
 
-| Decision | Alternative Considered | Why Mode Arena Chose This |
+| Decision | Alternative Considered | Why Model Arena Chose This |
 | :--- | :--- | :--- |
 | **Cloud Run** | GKE Autopilot / Compute Engine | Cloud Run offers pure scale-to-zero ($0 idle cost), eliminating GKE's ~$74/mo management fee and unused node capacity. |
 | **Cloud SQL (pgvector)** | Cloud Firestore / Pinecone | Startups overwhelmingly run PostgreSQL. Showing `pgvector` running directly inside Cloud SQL provides immediate technical relevance. |

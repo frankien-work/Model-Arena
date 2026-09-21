@@ -1,6 +1,6 @@
-# Mode Arena Living Product Roadmap 🗺
+# Model Arena Living Product Roadmap 🗺
 
-This living roadmap outlines the evolution of **Mode Arena** from foundational MVP to an advanced multi-agent security testbed for Google Cloud Customer Engineers (CEs) and Account Managers (AMs).
+This living roadmap outlines the evolution of **Model Arena** from foundational MVP to an advanced multi-agent security testbed for Google Cloud Customer Engineers (CEs) and Account Managers (AMs).
 
 ---
 
@@ -8,7 +8,7 @@ This living roadmap outlines the evolution of **Mode Arena** from foundational M
 
 ```mermaid
 gantt
-    title Mode Arena Development Roadmap
+    title Model Arena Development Roadmap
     dateFormat  YYYY-MM-DD
     section Phase 1: Core Foundation
     Multi-Model Arena & Streaming      :done,    des1, 2026-09-01, 2026-09-20
@@ -42,7 +42,7 @@ gantt
 ---
 
 ### Phase 2: Enterprise Telemetry & Sales Enablement (v1.1.0 - Q4 2026)
-- [ ] **BigQuery Streaming Ingestion:** Direct streaming insert of execution metrics (TTFT, total latency, input/output tokens, cost, security findings) into BigQuery table `mode_arena_telemetry.benchmark_runs`.
+- [ ] **BigQuery Streaming Ingestion:** Direct streaming insert of execution metrics (TTFT, total latency, input/output tokens, cost, security findings) into BigQuery table `model_arena_telemetry.benchmark_runs`.
 - [ ] **Embedded Looker Studio Dashboard:** Ready-made executive charts visualizing model cost comparisons and latency distributions over 30 days.
 - [ ] **Automated Cloud SQL Sleep Schedule:** Cloud Scheduler + Cloud Run Job to automatically stop Cloud SQL at 8:00 PM and resume at 8:00 AM weekdays, cutting database cost by 65%.
 - [ ] **Client Pitch Mode Polish:** Full-screen presentation mode that converts complex technical benchmark data into client-friendly slides with one click.
@@ -67,7 +67,7 @@ gantt
 
 ## 💡 Suggesting New Features
 
-If you are a Sales Engineer or Account Manager using Mode Arena and need a specific GCP feature or model added:
+If you are a Sales Engineer or Account Manager using Model Arena and need a specific GCP feature or model added:
 1. Check [FEATURES.md](./FEATURES.md) to see if it's already supported or planned.
 2. Review the cost impact in [COST_OPTIMIZATION.md](./COST_OPTIMIZATION.md).
 3. Submit a feature request via Git issue or PR following [VERSIONING.md](./VERSIONING.md).

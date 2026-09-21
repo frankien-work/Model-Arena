@@ -9,7 +9,7 @@ output "region" {
 }
 
 output "cloud_run_url" {
-  description = "Public URL of Mode Arena on Cloud Run"
+  description = "Public URL of Model Arena on Cloud Run"
   value       = module.cloud_run.service_url
 }
 

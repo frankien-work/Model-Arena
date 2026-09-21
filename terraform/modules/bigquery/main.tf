@@ -11,9 +11,9 @@ variable "project_id" { type = string }
 variable "region" { type = string }
 
 resource "google_bigquery_dataset" "telemetry" {
-  dataset_id                  = "mode_arena_telemetry"
-  friendly_name               = "Mode Arena Telemetry"
-  description                 = "Live latency, token, and cost telemetry for Mode Arena"
+  dataset_id                  = "model_arena_telemetry"
+  friendly_name               = "Model Arena Telemetry"
+  description                 = "Live latency, token, and cost telemetry for Model Arena"
   location                    = var.region
   project                     = var.project_id
   delete_contents_on_destroy  = true

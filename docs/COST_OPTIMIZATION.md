@@ -1,6 +1,6 @@
-# Mode Arena Cost Optimization & Budget Guide 💵
+# Model Arena Cost Optimization & Budget Guide 💵
 
-This document details how **Mode Arena** maintains strict financial discipline, guaranteeing that monthly Google Cloud spend stays safely below the **$600/month budget ceiling** (with realistic monthly spend running between **$75 and $190/month**).
+This document details how **Model Arena** maintains strict financial discipline, guaranteeing that monthly Google Cloud spend stays safely below the **$600/month budget ceiling** (with realistic monthly spend running between **$75 and $190/month**).
 
 ---
 
@@ -38,7 +38,7 @@ Cloud Run automatically spins down container instances when no requests are bein
 
 Cloud SQL instances accrue compute charges 24/7 unless paused. For an SE sandbox, you only need the database during demo hours.
 
-Mode Arena includes an automated control script [`scripts/toggle-cloud-sql.sh`](../scripts/toggle-cloud-sql.sh):
+Model Arena includes an automated control script [`scripts/toggle-cloud-sql.sh`](../scripts/toggle-cloud-sql.sh):
 
 ```bash
 # Pause Cloud SQL when finished with demos
@@ -73,9 +73,9 @@ To prevent accidental runaway loops or multi-megabyte prompt pastes during custo
 The Terraform infrastructure module [`terraform/modules/budget/`](../terraform/modules/budget/) automatically provisions a Google Cloud Billing Budget linked to your billing account:
 
 ```hcl
-resource "google_billing_budget" "mode_arena_budget" {
+resource "google_billing_budget" "model_arena_budget" {
   billing_account = var.billing_account_id
-  display_name    = "Mode Arena Sandbox Monthly Budget"
+  display_name    = "Model Arena Sandbox Monthly Budget"
 
   budget_filter {
     projects = ["projects/${var.project_id}"]

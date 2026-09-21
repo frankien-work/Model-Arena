@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Mode Arena - Argolis Sandbox Setup & API Enablement Script
+# Model Arena - Argolis Sandbox Setup & API Enablement Script
 # Usage:
 #   ./scripts/setup-argolis.sh [PROJECT_ID] [REGION]
 # ==============================================================================
@@ -9,7 +9,7 @@ set -euo pipefail
 
 PROJECT_ID="${1:-${GCP_PROJECT_ID:-$(gcloud config get-value project 2>/dev/null || echo "")}}"
 REGION="${2:-${GCP_REGION:-us-central1}}"
-SA_NAME="mode-arena-sa"
+SA_NAME="model-arena-sa"
 
 if [[ -z "${PROJECT_ID}" ]]; then
   echo "❌ Error: Project ID required."
@@ -18,7 +18,7 @@ if [[ -z "${PROJECT_ID}" ]]; then
 fi
 
 echo "============================================================"
-echo "⚡️ Mode Arena: Setting up Argolis GCP Environment"
+echo "⚡️ Model Arena: Setting up Argolis GCP Environment"
 echo "Project ID: ${PROJECT_ID}"
 echo "Region:     ${REGION}"
 echo "============================================================"
@@ -51,7 +51,7 @@ SA_EMAIL="${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com"
 if ! gcloud iam service-accounts describe "${SA_EMAIL}" --project="${PROJECT_ID}" &>/dev/null; then
   gcloud iam service-accounts create "${SA_NAME}" \
     --project="${PROJECT_ID}" \
-    --display-name="Mode Arena Cloud Run Service Account" \
+    --display-name="Model Arena Cloud Run Service Account" \
     --quiet
   echo "✅ Service account created: ${SA_EMAIL}"
 else
@@ -81,18 +81,18 @@ done
 echo "✅ IAM roles granted."
 
 # 4. Create BigQuery Telemetry Dataset
-echo "📊 Step 4/4: Initializing BigQuery dataset 'mode_arena_telemetry'..."
-if ! bq show --project_id="${PROJECT_ID}" mode_arena_telemetry &>/dev/null; then
+echo "📊 Step 4/4: Initializing BigQuery dataset 'model_arena_telemetry'..."
+if ! bq show --project_id="${PROJECT_ID}" model_arena_telemetry &>/dev/null; then
   bq --location="${REGION}" mk \
     --dataset \
-    --description="Mode Arena live latency, token, and cost telemetry" \
-    "${PROJECT_ID}:mode_arena_telemetry" || true
-  echo "✅ Dataset 'mode_arena_telemetry' created."
+    --description="Model Arena live latency, token, and cost telemetry" \
+    "${PROJECT_ID}:model_arena_telemetry" || true
+  echo "✅ Dataset 'model_arena_telemetry' created."
 else
-  echo "ℹ️ Dataset 'mode_arena_telemetry' already exists."
+  echo "ℹ️ Dataset 'model_arena_telemetry' already exists."
 fi
 
 echo "============================================================"
-echo "🎉 Mode Arena Argolis setup complete!"
+echo "🎉 Model Arena Argolis setup complete!"
 echo "Next step: Run './scripts/deploy.sh' to build & deploy to Cloud Run."
 echo "============================================================"

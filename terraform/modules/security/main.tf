@@ -9,9 +9,9 @@ terraform {
 
 variable "project_id" { type = string }
 
-resource "google_service_account" "mode_arena_sa" {
-  account_id   = "mode-arena-sa"
-  display_name = "Mode Arena Application Service Account"
+resource "google_service_account" "model_arena_sa" {
+  account_id   = "model-arena-sa"
+  display_name = "Model Arena Application Service Account"
   project      = var.project_id
 }
 
@@ -32,9 +32,9 @@ resource "google_project_iam_member" "sa_roles" {
   for_each = toset(locals.roles)
   project  = var.project_id
   role     = each.key
-  member   = "serviceAccount:${google_service_account.mode_arena_sa.email}"
+  member   = "serviceAccount:${google_service_account.model_arena_sa.email}"
 }
 
 output "service_account_email" {
-  value = google_service_account.mode_arena_sa.email
+  value = google_service_account.model_arena_sa.email
 }

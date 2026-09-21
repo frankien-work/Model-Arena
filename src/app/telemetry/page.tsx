@@ -34,7 +34,7 @@ export default function TelemetryPage() {
             </span>
           </h1>
           <p className="text-sm text-slate-400 mt-1">
-            Real-time analytics dataset <code>mode_arena_telemetry.benchmark_runs</code> partitioned by day.
+            Real-time analytics dataset <code>model_arena_telemetry.benchmark_runs</code> partitioned by day.
           </p>
         </div>
 
@@ -135,7 +135,7 @@ export default function TelemetryPage() {
     APPROX_QUANTILES(ttft_ms, 100)[OFFSET(95)] AS p95_ttft,
     ROUND(SUM(cost_usd), 4) AS total_spend_usd,
     COUNTIF(model_armor_status = 'BLOCK') AS security_interceptions
-FROM \`mode_arena_telemetry.benchmark_runs\`
+FROM \`model_arena_telemetry.benchmark_runs\`
 WHERE _PARTITIONDATE >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)
 GROUP BY model_id
 ORDER BY total_runs DESC;`}

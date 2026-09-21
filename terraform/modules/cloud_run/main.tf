@@ -11,8 +11,8 @@ variable "project_id" { type = string }
 variable "region" { type = string }
 variable "service_account_email" { type = string }
 
-resource "google_cloud_run_v2_service" "mode_arena" {
-  name     = "mode-arena"
+resource "google_cloud_run_v2_service" "model_arena" {
+  name     = "model-arena"
   location = var.region
   project  = var.project_id
 
@@ -25,7 +25,7 @@ resource "google_cloud_run_v2_service" "mode_arena" {
     }
 
     containers {
-      image = "gcr.io/${var.project_id}/mode-arena:latest"
+      image = "gcr.io/${var.project_id}/model-arena:latest"
       
       resources {
         limits = {
@@ -51,13 +51,13 @@ resource "google_cloud_run_v2_service" "mode_arena" {
 }
 
 resource "google_cloud_run_service_iam_member" "public_access" {
-  location = google_cloud_run_v2_service.mode_arena.location
-  project  = google_cloud_run_v2_service.mode_arena.project
-  service  = google_cloud_run_v2_service.mode_arena.name
+  location = google_cloud_run_v2_service.model_arena.location
+  project  = google_cloud_run_v2_service.model_arena.project
+  service  = google_cloud_run_v2_service.model_arena.name
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
 
 output "service_url" {
-  value = google_cloud_run_v2_service.mode_arena.uri
+  value = google_cloud_run_v2_service.model_arena.uri
 }
