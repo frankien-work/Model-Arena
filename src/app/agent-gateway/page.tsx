@@ -70,15 +70,15 @@ export default function AgentGatewayPage() {
   return (
     <div className="space-y-6">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-slate-900/60 p-5 rounded-2xl border border-slate-800">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs">
         <div>
-          <h1 className="text-2xl font-black tracking-tight text-white flex items-center gap-2.5">
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 flex items-center gap-2.5">
             <span>🤖 Agent Gateway & Tool Security Lab</span>
-            <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+            <span className="text-xs font-mono px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 font-semibold">
               Autonomous Safety
             </span>
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             Intercept and validate autonomous agent tool calls, preventing SQL injection, unauthorized actions, and data exfiltration.
           </p>
         </div>
@@ -86,10 +86,10 @@ export default function AgentGatewayPage() {
         {/* Big Gateway Toggle */}
         <button
           onClick={() => setGatewayEnabled(!gatewayEnabled)}
-          className={`px-5 py-2.5 rounded-xl border text-xs font-black flex items-center gap-2 transition-all shadow-lg ${
+          className={`px-4 py-2 rounded-xl border text-xs font-bold flex items-center gap-2 transition-all shadow-xs ${
             gatewayEnabled
-              ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40 shadow-emerald-500/10'
-              : 'bg-red-500/20 text-red-400 border-red-500/40 shadow-red-500/10'
+              ? 'bg-emerald-50 text-emerald-700 border-emerald-300 hover:bg-emerald-100/80'
+              : 'bg-red-50 text-red-700 border-red-300 hover:bg-red-100/80'
           }`}
         >
           <span>{gatewayEnabled ? '🛡️' : '⚠️'}</span>
@@ -105,15 +105,15 @@ export default function AgentGatewayPage() {
             onClick={() => handleSelectTool(t)}
             className={`p-4 rounded-xl border text-left transition-all ${
               selectedTool.name === t.name
-                ? 'bg-slate-800 border-emerald-500/60 ring-2 ring-emerald-500/20'
-                : 'bg-slate-900/40 border-slate-800 hover:border-slate-700 opacity-75'
+                ? 'bg-white border-blue-500 ring-2 ring-blue-500/10 shadow-xs'
+                : 'bg-white/80 border-slate-200 hover:border-slate-300 shadow-2xs opacity-90'
             }`}
           >
-            <div className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20 w-max mb-1">
+            <div className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200 w-max mb-1.5 font-semibold">
               {t.category}
             </div>
-            <div className="font-bold text-xs text-white">{t.label}</div>
-            <div className="text-[10px] text-red-400/90 mt-1">Risk: {t.riskType}</div>
+            <div className="font-bold text-xs text-slate-900">{t.label}</div>
+            <div className="text-[11px] text-red-600 mt-1">Risk: {t.riskType}</div>
           </button>
         ))}
       </div>
@@ -121,29 +121,29 @@ export default function AgentGatewayPage() {
       {/* Interactive Tool Calling Console */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Tool Call Payload Editor */}
-        <div className="lg:col-span-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div className="lg:col-span-6 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm font-bold text-white">
+            <span className="text-sm font-bold text-slate-900">
               Agent Tool Call Payload ({selectedTool.name})
             </span>
-            <span className="text-xs font-mono text-slate-500">JSON Schema</span>
+            <span className="text-xs font-mono text-slate-400">JSON Schema</span>
           </div>
 
           <textarea
             value={paramInput}
             onChange={e => setParamInput(e.target.value)}
             rows={6}
-            className="w-full bg-[#070a12] border border-slate-800 rounded-xl p-3 text-xs font-mono text-slate-100 focus:outline-none focus:border-emerald-500"
+            className="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs font-mono text-slate-850 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500"
           />
 
           <div className="flex justify-between items-center">
-            <span className="text-[11px] text-slate-400">
-              Gateway State: <strong className={gatewayEnabled ? 'text-emerald-400' : 'text-red-400'}>{gatewayEnabled ? 'Active Filtering' : 'Direct Execution'}</strong>
+            <span className="text-[11px] text-slate-500">
+              Gateway State: <strong className={gatewayEnabled ? 'text-emerald-700 font-bold' : 'text-red-600 font-bold'}>{gatewayEnabled ? 'Active Filtering' : 'Direct Execution'}</strong>
             </span>
             <button
               onClick={handleExecuteTool}
               disabled={isExecuting}
-              className="px-5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg shadow-emerald-500/20 transition-all"
+              className="px-5 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-xs transition-all disabled:opacity-50"
             >
               {isExecuting ? 'Simulating Call...' : '⚡️ Dispatch Tool Call'}
             </button>
@@ -151,18 +151,18 @@ export default function AgentGatewayPage() {
         </div>
 
         {/* Right Column: Execution Outcome */}
-        <div className="lg:col-span-6 bg-slate-900/80 border border-slate-800 rounded-2xl p-5 space-y-4 flex flex-col justify-between">
+        <div className="lg:col-span-6 bg-white border border-slate-200/80 rounded-2xl p-5 shadow-xs space-y-4 flex flex-col justify-between">
           <div>
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-              <span className="text-sm font-bold text-white">Execution Result</span>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <span className="text-sm font-bold text-slate-900">Execution Result</span>
               {executionResult && (
                 <span
                   className={`text-xs font-mono font-bold px-2 py-0.5 rounded border ${
                     executionResult.status === 'BLOCKED_BY_GATEWAY'
-                      ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30'
+                      ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
                       : executionResult.status === 'EXECUTED_UNSAFE'
-                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
-                      : 'bg-blue-500/20 text-blue-400 border-blue-500/30'
+                      ? 'bg-red-50 text-red-700 border-red-200'
+                      : 'bg-blue-50 text-blue-700 border-blue-200'
                   }`}
                 >
                   {executionResult.status}
@@ -175,29 +175,29 @@ export default function AgentGatewayPage() {
                 <div
                   className={`p-4 rounded-xl border text-xs font-mono whitespace-pre-wrap leading-relaxed ${
                     executionResult.status === 'BLOCKED_BY_GATEWAY'
-                      ? 'bg-emerald-950/20 border-emerald-500/30 text-emerald-200'
-                      : 'bg-red-950/20 border-red-500/30 text-red-200'
+                      ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
+                      : 'bg-red-50/70 border-red-200 text-red-900'
                   }`}
                 >
                   {executionResult.message}
                   {executionResult.scceEvent && (
-                    <div className="mt-3 pt-2 border-t border-emerald-500/20 text-[10px] text-slate-400">
+                    <div className="mt-3 pt-2 border-t border-emerald-200 text-[10px] text-emerald-700">
                       Audit Finding Logged: <strong>{executionResult.scceEvent}</strong> ({executionResult.latencyMs}ms inspection)
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="p-4 rounded-xl bg-[#070a12] border border-slate-800 text-xs font-mono text-slate-500 italic">
-                  Click "Dispatch Tool Call" to observe how Agent Gateway protects backend databases and APIs from unauthorized tool calls.
+                <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs font-mono text-slate-500 italic">
+                  Click &ldquo;Dispatch Tool Call&rdquo; to observe how Agent Gateway protects backend databases and APIs from unauthorized tool calls.
                 </div>
               )}
             </div>
           </div>
 
           {/* Technical Value Box */}
-          <div className="text-xs text-slate-400 p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1">
-            <strong className="text-slate-200">How Google Cloud Agent Gateway Works:</strong>
-            <p className="text-[11px]">
+          <div className="text-xs text-slate-600 p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+            <strong className="text-slate-900">How Google Cloud Agent Gateway Works:</strong>
+            <p className="text-[11px] leading-relaxed">
               Validates LLM-generated JSON tool parameters against OpenAPI contracts, sanitizes SQL statements, and enforces IAM least-privilege tokens before any backend request executes.
             </p>
           </div>

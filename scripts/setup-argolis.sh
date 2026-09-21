@@ -34,6 +34,8 @@ APIS=(
   cloudbuild.googleapis.com
   artifactregistry.googleapis.com
   secretmanager.googleapis.com
+  modelarmor.googleapis.com
+  dlp.googleapis.com
   logging.googleapis.com
   monitoring.googleapis.com
 )
@@ -67,6 +69,8 @@ ROLES=(
   roles/bigquery.jobUser
   roles/storage.objectViewer
   roles/secretmanager.secretAccessor
+  roles/modelarmor.user
+  roles/dlp.user
   roles/logging.logWriter
   roles/monitoring.metricWriter
 )
