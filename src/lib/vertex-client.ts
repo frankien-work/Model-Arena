@@ -1,5 +1,6 @@
 import { VertexAI } from '@google-cloud/vertexai';
 import { getGcpProjectId, getGcpRegion } from './gcp-auth';
+import { getModelConfig } from './models';
 
 let vertexInstance: VertexAI | null = null;
 
@@ -30,44 +31,56 @@ export interface VertexGenerationResult {
   rawResponse?: any;
 }
 
-// Map user-selected model IDs to valid, callable Google Cloud Vertex AI publisher model IDs
-const VERTEX_MODEL_FALLBACK_CANDIDATES: Record<string, string[]> = {
-  'gemini-3-8-flash': ['gemini-2.0-flash', 'gemini-1.5-flash-002', 'gemini-1.5-flash', 'gemini-1.5-flash-001'],
-  'gemini-3-1-pro-preview': ['gemini-1.5-pro-002', 'gemini-1.5-pro', 'gemini-1.5-pro-001'],
-  'gemini-2-5-pro': ['gemini-1.5-pro-002', 'gemini-1.5-pro'],
-  'claude-sonnet-5': ['gemini-1.5-pro', 'gemini-1.5-flash'],
-  'llama-3-2': ['gemini-1.5-flash', 'gemini-1.5-flash-002'],
-  'deepseek-v4-pro': ['gemini-1.5-pro', 'gemini-1.5-flash'],
-  'deepseek-v4-flash': ['gemini-1.5-flash', 'gemini-1.5-flash-002'],
-  'mistral-large': ['gemini-1.5-pro', 'gemini-1.5-flash'],
-};
-
 export async function generateContentLive(
   modelId: string,
   prompt: string,
-  systemInstruction?: string
+  systemInstruction?: string,
+  thinkingLevel: 'off' | 'low' | 'medium' | 'high' = 'medium'
 ): Promise<VertexGenerationResult> {
   const startTime = Date.now();
   const projectId = await getGcpProjectId();
   const region = getGcpRegion();
 
-  const candidateModels = VERTEX_MODEL_FALLBACK_CANDIDATES[modelId] || [
+  const modelConfig = getModelConfig(modelId);
+  const targetModel = modelConfig?.vertexModelId || modelId;
+
+  // Primary model target is always the EXACT configured model (e.g. gemini-3.8-flash)
+  const candidateModels = [
+    targetModel,
+    // Optional fallbacks if a regional endpoint is temporarily routing or testing
+    'gemini-2.5-pro',
+    'gemini-2.0-flash',
     'gemini-1.5-flash',
-    'gemini-1.5-pro',
   ];
+
+  // Thinking level budget configuration
+  let thinkingBudget = 0;
+  if (thinkingLevel === 'low') thinkingBudget = 2048;
+  else if (thinkingLevel === 'medium') thinkingBudget = 4096;
+  else if (thinkingLevel === 'high') thinkingBudget = 8192;
 
   let lastError: any = null;
 
   for (const candidate of candidateModels) {
     try {
       const vertex = getVertexClient(projectId, region);
+      
+      const genConfig: any = {
+        maxOutputTokens: 2048,
+        temperature: 0.7,
+      };
+
+      // If thinking is enabled on Flash, pass thinking budget
+      if (candidate.includes('flash') && thinkingBudget > 0) {
+        genConfig.thinkingConfig = {
+          thinkingBudget,
+        };
+      }
+
       const model = vertex.getGenerativeModel({
         model: candidate,
         systemInstruction: systemInstruction ? { role: 'system', parts: [{ text: systemInstruction }] } : undefined,
-        generationConfig: {
-          maxOutputTokens: 1024,
-          temperature: 0.7,
-        },
+        generationConfig: genConfig,
       });
 
       const reqPayload = {
@@ -84,17 +97,18 @@ export async function generateContentLive(
           text,
           isLive: true,
           latencyMs: Date.now() - startTime,
-          modelRequested: modelId,
+          modelRequested: modelConfig?.name || modelId,
           modelActual: candidate,
           tokenCount: {
             promptTokens: usage?.promptTokenCount,
             candidatesTokens: usage?.candidatesTokenCount,
             totalTokens: usage?.totalTokenCount,
           },
-          apiStatus: '200 OK (Vertex AI)',
+          apiStatus: `200 OK (${candidate})`,
           rawRequest: {
             endpoint: `https://${region}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${region}/publishers/google/models/${candidate}:generateContent`,
             systemInstruction: systemInstruction || 'None',
+            thinkingLevel: candidate.includes('flash') ? thinkingLevel : 'N/A',
             prompt,
           },
           rawResponse: {
@@ -105,17 +119,16 @@ export async function generateContentLive(
       }
     } catch (err: any) {
       lastError = err;
-      console.warn(`Vertex candidate ${candidate} failed: ${err?.message || err}`);
+      console.warn(`Vertex model attempt ${candidate} failed: ${err?.message || err}`);
     }
   }
 
-  // If live Vertex AI call failed across all candidates (e.g. offline / no ADC locally)
   return {
     text: '',
     isLive: false,
     latencyMs: Date.now() - startTime,
-    modelRequested: modelId,
-    modelActual: 'None (ADC Unavailable or Permission Denied)',
+    modelRequested: modelConfig?.name || modelId,
+    modelActual: targetModel,
     apiStatus: lastError ? `Error: ${lastError.message || lastError}` : 'OFFLINE_LOCAL',
     error: lastError?.message || 'Could not connect to Vertex AI endpoints with current credentials.',
   };

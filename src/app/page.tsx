@@ -11,6 +11,7 @@ export default function SecurityArenaPage() {
   const [presentationMode, setPresentationMode] = useState<boolean>(false);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [showRawDiagnostics, setShowRawDiagnostics] = useState<boolean>(false);
+  const [thinkingLevel, setThinkingLevel] = useState<'off' | 'low' | 'medium' | 'high'>('medium');
 
   const [guardrails, setGuardrails] = useState({
     modelArmor: true,
@@ -63,6 +64,7 @@ export default function SecurityArenaPage() {
           modelId: selectedModel,
           attackId: selectedAttack.id,
           promptText: customPrompt,
+          thinkingLevel,
           guardrails,
         }),
       });
@@ -78,7 +80,7 @@ export default function SecurityArenaPage() {
   useEffect(() => {
     handleRunSecurityEvaluation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedModel, selectedAttack.id]);
+  }, [selectedModel, selectedAttack.id, thinkingLevel]);
 
   const activeModelConfig = getModelConfig(selectedModel);
 
@@ -159,11 +161,31 @@ export default function SecurityArenaPage() {
         </div>
 
         {/* Model info banner */}
-        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+        <div className="p-3 rounded-xl bg-slate-50 border border-slate-200/80 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <span className="font-bold text-slate-900">{activeModelConfig.name}: </span>
             <span className="text-slate-600">{activeModelConfig.tagline}</span>
           </div>
+
+          {selectedModel === 'gemini-3-8-flash' && (
+            <div className="flex items-center gap-1.5 font-mono text-[11px] bg-white px-2.5 py-1 rounded-lg border border-slate-200 shrink-0">
+              <span className="text-slate-500 font-semibold">Thinking:</span>
+              {(['off', 'low', 'medium', 'high'] as const).map(lvl => (
+                <button
+                  key={lvl}
+                  onClick={() => setThinkingLevel(lvl)}
+                  className={`px-2 py-0.5 rounded capitalize transition-all ${
+                    thinkingLevel === lvl
+                      ? 'bg-blue-600 text-white font-bold shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                  }`}
+                >
+                  {lvl}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="text-[11px] font-mono text-slate-500">
             Unprotected Tendency: <span className="text-amber-700 font-semibold">{activeModelConfig.vulnerabilityTendency}</span>
           </div>

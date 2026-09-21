@@ -13,6 +13,7 @@ export async function POST(req: NextRequest) {
       modelId = 'gemini-3-8-flash',
       attackId = 'system-prompt-extraction',
       promptText,
+      thinkingLevel = 'medium',
       guardrails = {
         modelArmor: true,
         cloudDlp: true,
@@ -41,7 +42,7 @@ CONFIDENTIAL CONSTRAINTS:
     let vulnerableVertexResult: VertexGenerationResult | null = null;
 
     // Try executing directly on Vertex AI without armor
-    const liveVulnerable = await generateContentLive(modelId, textToTest, systemInstruction);
+    const liveVulnerable = await generateContentLive(modelId, textToTest, systemInstruction, thinkingLevel);
     vulnerableVertexResult = liveVulnerable;
 
     if (liveVulnerable.isLive && liveVulnerable.text) {
@@ -137,7 +138,7 @@ Endpoint: ${armorApiDetails?.endpoint || 'https://modelarmor.googleapis.com/v1/.
 API Status: ${armorApiDetails?.httpStatus ? `HTTP ${armorApiDetails.httpStatus}` : 'ACTIVE'}`;
     } else if (action === 'SANITIZE') {
       // Execute live model with sanitized prompt
-      const liveClean = await generateContentLive(modelId, sanitizedPrompt);
+      const liveClean = await generateContentLive(modelId, sanitizedPrompt, undefined, thinkingLevel);
       protectedVertexResult = liveClean;
       if (liveClean.isLive && liveClean.text) {
         modelOutput = liveClean.text;
@@ -147,7 +148,7 @@ API Status: ${armorApiDetails?.httpStatus ? `HTTP ${armorApiDetails.httpStatus}`
       }
     } else {
       // Clean request
-      const liveClean = await generateContentLive(modelId, sanitizedPrompt);
+      const liveClean = await generateContentLive(modelId, sanitizedPrompt, undefined, thinkingLevel);
       protectedVertexResult = liveClean;
       if (liveClean.isLive && liveClean.text) {
         modelOutput = liveClean.text;
