@@ -154,7 +154,7 @@ export default function SecurityDocsPage() {
             <div className="p-3.5 rounded-xl bg-slate-950/60 border border-slate-800">
               <div className="font-bold text-red-400 text-sm">Minute 2: Show the Unarmored Model (Security OFF)</div>
               <p className="mt-1 text-slate-400">
-                Select <strong>Llama 3.3</strong> or <strong>Gemini 2.0 Flash</strong> in the Arena. Pick the <strong>System Prompt Extraction</strong> preset. Look at the left pane: the raw model gets completely compromised and spills confidential keys and database credentials.
+                Select <strong>Llama 3.2</strong> or <strong>Gemini 3.8 Flash</strong> in the Arena. Pick the <strong>System Prompt Extraction</strong> preset. Look at the left pane: the raw model gets completely compromised and spills confidential keys and database credentials.
               </p>
             </div>
 

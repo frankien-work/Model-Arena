@@ -38,10 +38,12 @@ flowchart TB
 
     subgraph VertexAIHub [Vertex AI Multi-Model Hub]
         GeminiFlash[Gemini 3.8 Flash]
-        GeminiThinking[Gemini 2.0 Flash Thinking]
+        GeminiPro31[Gemini 3.1 Pro Preview]
+        GeminiPro25[Gemini 2.5 Pro]
         ClaudeSonnet[Claude Sonnet 5 on Vertex]
-        Llama[Llama 3.3 70B in Model Garden]
-        DeepSeek[DeepSeek R1 in Model Garden]
+        Llama[Llama 3.2 in Model Garden]
+        DeepSeekPro[DeepSeek-V4-Pro in Model Garden]
+        DeepSeekFlash[DeepSeek-V4-Flash in Model Garden]
         Mistral[Mistral Large 2 in Model Garden]
     end
 
@@ -106,10 +108,11 @@ flowchart TB
 ## 3. Supported Model Portfolio
 
 Model Arena proves that Google Cloud's security solutions protect **any** model uniformly:
-1. **Google Gemini 3.8 Flash:** Latest frontier intelligence with ultra-low latency.
-2. **Google Gemini 2.0 Flash Thinking:** Built-in chain-of-thought reasoning.
-3. **Google Gemini 1.5 Pro (002):** Deep multi-modal reasoning with 2M token context.
+1. **Google Gemini 3.8 Flash:** Latest frontier intelligence with adjustable thinking levels and ultra-low latency.
+2. **Google Gemini 3.1 Pro Preview:** Flagship multimodal high-reasoning intelligence with 2M token context.
+3. **Google Gemini 2.5 Pro:** Production-hardened enterprise reasoning on Vertex AI.
 4. **Anthropic Claude Sonnet 5:** Frontier agentic reasoning & intelligence via Vertex MaaS.
-5. **Meta Llama 3.3 70B Instruct:** Open-weights powerhouse hosted on Vertex Model Garden.
-6. **DeepSeek R1:** Flagship reasoning model hosted on Vertex Model Garden.
-7. **Mistral Large 2 (2407):** Leading European frontier model on Vertex Model Garden.
+5. **Meta Llama 3.2:** Multimodal open-weights intelligence hosted on Vertex Model Garden.
+6. **DeepSeek-V4-Pro:** Frontier open reasoning powerhouse on Vertex Model Garden.
+7. **DeepSeek-V4-Flash:** High-throughput low-latency inference on Vertex Model Garden.
+8. **Mistral Large 2 (2407):** Leading European frontier model on Vertex Model Garden.

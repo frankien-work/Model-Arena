@@ -105,7 +105,7 @@ export default function SecurityArenaPage() {
           <span>Select Target Model:</span>
           <span className="font-mono text-blue-400">Vertex AI Model Garden & MaaS</span>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2">
           {Object.values(SUPPORTED_MODELS).map((m: ModelConfig) => {
             const isSelected = selectedModel === m.id;
             return (

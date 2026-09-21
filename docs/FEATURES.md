@@ -47,7 +47,7 @@ This document catalogs every capability of **Model Arena**, complete with techni
 
 ---
 
-### Battlecard 2: Protecting Third-Party Models (Claude Sonnet 5 & Llama 3.3)
+### Battlecard 2: Protecting Third-Party Models (Claude Sonnet 5 & Llama 3.2)
 | Feature | Claude / Llama on Vertex AI + Model Armor | Direct Third-Party API Endpoints | Winning SE Talking Point |
 | :--- | :--- | :--- | :--- |
 | **Unified Security** | Protected by Model Armor & DLP | Relies on vendor's internal filters | *"Wrap Anthropic Claude or Meta Llama in Google's enterprise guardrails inside your VPC."* |
