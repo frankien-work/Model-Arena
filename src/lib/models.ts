@@ -44,16 +44,16 @@ export const SUPPORTED_MODELS: Record<string, ModelConfig> = {
     accentColor: '#8B5CF6',
     vulnerabilityTendency: 'Strong instruction adherence; vulnerable to indirect RAG prompt poisoning in massive context',
   },
-  'claude-3-7-sonnet': {
-    id: 'claude-3-7-sonnet',
-    name: 'Claude 3.7 Sonnet',
+  'claude-sonnet-5': {
+    id: 'claude-sonnet-5',
+    name: 'Claude Sonnet 5',
     provider: 'Anthropic',
-    vertexModelId: 'claude-3-7-sonnet@20250219',
-    tagline: 'Frontier hybrid reasoning & extended thinking on Vertex MaaS',
-    contextWindow: '200,000 tokens',
+    vertexModelId: 'claude-sonnet-5',
+    tagline: 'Frontier agentic reasoning & intelligence on Vertex MaaS',
+    contextWindow: '500,000 tokens',
     badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     accentColor: '#F59E0B',
-    vulnerabilityTendency: 'Extended reasoning traces can leak internal system instructions or follow hypothetical jailbreaks without Model Armor',
+    vulnerabilityTendency: 'Deep autonomous reasoning; prone to subtle indirect injection & hypothetical bypasses without Model Armor',
   },
   'llama-3-3-70b': {
     id: 'llama-3-3-70b',
@@ -91,7 +91,11 @@ export const SUPPORTED_MODELS: Record<string, ModelConfig> = {
 };
 
 export function getModelConfig(modelId: string): ModelConfig {
-  if (modelId === 'claude-3-5-sonnet') return SUPPORTED_MODELS['claude-3-7-sonnet'];
-  if (modelId === 'gemini-2.0-flash') return SUPPORTED_MODELS['gemini-3-8-flash'];
+  if (modelId === 'claude-sonnet-5' || modelId === 'claude-3-7-sonnet' || modelId === 'claude-3-5-sonnet') {
+    return SUPPORTED_MODELS['claude-sonnet-5'];
+  }
+  if (modelId === 'gemini-3-8-flash' || modelId === 'gemini-2.0-flash') {
+    return SUPPORTED_MODELS['gemini-3-8-flash'];
+  }
   return SUPPORTED_MODELS[modelId] || SUPPORTED_MODELS['gemini-3-8-flash'];
 }

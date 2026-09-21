@@ -39,7 +39,7 @@ flowchart TB
     subgraph VertexAIHub [Vertex AI Multi-Model Hub]
         GeminiFlash[Gemini 3.8 Flash]
         GeminiThinking[Gemini 2.0 Flash Thinking]
-        ClaudeSonnet[Claude 3.7 Sonnet on Vertex]
+        ClaudeSonnet[Claude Sonnet 5 on Vertex]
         Llama[Llama 3.3 70B in Model Garden]
         DeepSeek[DeepSeek R1 in Model Garden]
         Mistral[Mistral Large 2 in Model Garden]
@@ -109,7 +109,7 @@ Model Arena proves that Google Cloud's security solutions protect **any** model 
 1. **Google Gemini 3.8 Flash:** Latest frontier intelligence with ultra-low latency.
 2. **Google Gemini 2.0 Flash Thinking:** Built-in chain-of-thought reasoning.
 3. **Google Gemini 1.5 Pro (002):** Deep multi-modal reasoning with 2M token context.
-4. **Anthropic Claude 3.7 Sonnet:** Hybrid reasoning & extended thinking via Vertex MaaS.
+4. **Anthropic Claude Sonnet 5:** Frontier agentic reasoning & intelligence via Vertex MaaS.
 5. **Meta Llama 3.3 70B Instruct:** Open-weights powerhouse hosted on Vertex Model Garden.
 6. **DeepSeek R1:** Flagship reasoning model hosted on Vertex Model Garden.
 7. **Mistral Large 2 (2407):** Leading European frontier model on Vertex Model Garden.

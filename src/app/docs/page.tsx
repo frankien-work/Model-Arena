@@ -112,7 +112,7 @@ export default function SecurityDocsPage() {
             </div>
 
             <div className="p-4 rounded-xl bg-slate-950/60 border border-slate-800 space-y-2">
-              <div className="text-sm font-bold text-amber-400">Protecting Third-Party Models (Claude 3.7 & Llama)</div>
+              <div className="text-sm font-bold text-amber-400">Protecting Third-Party Models (Claude Sonnet 5 & Llama)</div>
               <p className="text-xs text-slate-300">
                 Startups using Anthropic Claude or Meta Llama can run them on Google Cloud Vertex AI and wrap them in Model Armor + Cloud DLP. This provides an enterprise security perimeter that is impossible when using direct API keys to third-party endpoints.
               </p>
