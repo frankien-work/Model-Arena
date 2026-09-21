@@ -1,0 +1,6 @@
+# Copy this file to terraform.tfvars and update with your actual values
+project_id             = "your-argolis-project-id"
+region                 = "us-central1"
+billing_account_id     = "01XXXX-XXXXXX-XXXXXX"
+monthly_budget_ceiling = 600
+cloud_sql_tier         = "db-f1-micro"

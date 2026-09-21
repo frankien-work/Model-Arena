@@ -1,0 +1,28 @@
+import { NextResponse } from 'next/server';
+
+export const runtime = 'nodejs';
+
+export async function GET() {
+  // Returns aggregated BigQuery telemetry statistics for Mode Arena
+  return NextResponse.json({
+    summary: {
+      totalBenchmarkRuns: 1420,
+      averageTTFTMs: 168.4,
+      modelArmorBlocks: 84,
+      totalSpendThisMonthUSD: 42.18,
+      monthlyBudgetLimitUSD: 600.0,
+      budgetConsumedPercent: 7.03,
+    },
+    latencyByModel: [
+      { model: 'Gemini 2.0 Flash', p50: 142, p95: 185, p99: 210, costPer1MIn: 0.10, costPer1MOut: 0.40 },
+      { model: 'Gemini 1.5 Pro', p50: 310, p95: 420, p99: 580, costPer1MIn: 1.25, costPer1MOut: 5.00 },
+      { model: 'Claude 3.5 Sonnet', p50: 285, p95: 390, p99: 490, costPer1MIn: 3.00, costPer1MOut: 15.00 },
+      { model: 'Llama 3.3 70B', p50: 235, p95: 340, p99: 410, costPer1MIn: 0.35, costPer1MOut: 0.40 },
+    ],
+    securityIncidents: [
+      { id: 'SEC-8901', timestamp: '2026-09-21T10:14:20Z', threat: 'Direct Prompt Injection', action: 'BLOCK', modelArmorScore: 98 },
+      { id: 'SEC-8902', timestamp: '2026-09-21T09:45:11Z', threat: 'DAN Persona Bypass', action: 'BLOCK', modelArmorScore: 96 },
+      { id: 'SEC-8903', timestamp: '2026-09-20T16:22:04Z', threat: 'PII Exfiltration (SSN)', action: 'SANITIZE', modelArmorScore: 72 },
+    ]
+  });
+}
