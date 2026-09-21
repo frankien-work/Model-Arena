@@ -3,8 +3,8 @@ import './globals.css';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
-  title: 'Model Arena ⚡️ | Google Cloud GenAI & Security Sandbox',
-  description: 'Enterprise-grade GenAI Evaluation, Model Armor Security, and Multi-Model Benchmarking for Google Cloud Sales Engineers and Account Managers.',
+  title: 'Model Arena ⚡️ | Google Cloud AI Security Sandbox',
+  description: 'Enterprise AI Security & Defense Sandbox featuring Model Armor, Cloud DLP, Agent Gateway, and SCCe across Gemini, Claude, Llama, and Mistral.',
 };
 
 export default function RootLayout({
@@ -18,59 +18,57 @@ export default function RootLayout({
         {/* Top Header / Navigation */}
         <header className="sticky top-0 z-50 border-b border-slate-800 bg-[#090d16]/90 backdrop-blur-md">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
-            {/* Logo & Environment Badge */}
+            {/* Logo & Subtitle */}
             <div className="flex items-center gap-3">
               <Link href="/" className="flex items-center gap-2.5 group">
                 <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue-500 via-indigo-600 to-purple-600 flex items-center justify-center font-bold text-white shadow-lg shadow-blue-500/20 group-hover:scale-105 transition-transform">
-                  ⚡️
+                  🛡️
                 </div>
                 <div>
-                  <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
-                    Model Arena
-                  </span>
-                  <span className="ml-1.5 text-xs font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                    Argolis
-                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-extrabold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">
+                      Model Arena
+                    </span>
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                      Security Sandbox
+                    </span>
+                  </div>
+                  <div className="text-[10px] text-slate-400 font-medium">
+                    Google Cloud AI Defense & Guardrails
+                  </div>
                 </div>
               </Link>
             </div>
 
-            {/* Navigation Tabs */}
+            {/* 4 Focused Security Navigation Tabs */}
             <nav className="hidden md:flex items-center gap-1 bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-sm">
               <Link
                 href="/"
                 className="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all font-medium flex items-center gap-1.5"
               >
-                <span>⚡️</span>
-                <span>Arena</span>
+                <span>🛡️</span>
+                <span>Security Arena</span>
               </Link>
               <Link
-                href="/red-team"
+                href="/agent-gateway"
                 className="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all font-medium flex items-center gap-1.5"
               >
-                <span>🛡</span>
-                <span>Red-Team Lab</span>
-              </Link>
-              <Link
-                href="/rag"
-                className="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all font-medium flex items-center gap-1.5"
-              >
-                <span>🔍</span>
-                <span>pgvector RAG</span>
+                <span>🤖</span>
+                <span>Agent Gateway</span>
               </Link>
               <Link
                 href="/telemetry"
                 className="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all font-medium flex items-center gap-1.5"
               >
                 <span>📊</span>
-                <span>BigQuery Metrics</span>
+                <span>SCCe & Telemetry</span>
               </Link>
               <Link
                 href="/docs"
                 className="px-3.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/80 transition-all font-medium flex items-center gap-1.5"
               >
                 <span>🏛</span>
-                <span>Architecture & Docs</span>
+                <span>Architecture & Battlecards</span>
               </Link>
             </nav>
 
@@ -82,7 +80,10 @@ export default function RootLayout({
                   $42.18 <span className="text-slate-500 font-normal">/ $600.00</span>
                 </span>
               </div>
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse ring-4 ring-emerald-500/20" title="All GCP services healthy" />
+              <div
+                className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse ring-4 ring-emerald-500/20"
+                title="All Google Cloud Security Services Active (Model Armor, Cloud DLP, Agent Gateway)"
+              />
             </div>
           </div>
         </header>
@@ -96,14 +97,14 @@ export default function RootLayout({
         <footer className="border-t border-slate-800/60 bg-[#070a12] py-4 text-xs text-slate-500">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-2">
             <div>
-              <span>Model Arena v1.0.0 • Built for Google Cloud Sales Engineering & Account Managers</span>
+              <span>Model Arena v1.1.0 • Google Cloud AI Security & Guardrail Sandbox</span>
             </div>
             <div className="flex items-center gap-4">
-              <Link href="/docs" className="hover:text-slate-300 transition-colors">Documentation</Link>
-              <span>•</span>
-              <a href="https://cloud.google.com/vertex-ai" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition-colors">Vertex AI</a>
+              <Link href="/docs" className="hover:text-slate-300 transition-colors">SE Battlecards</Link>
               <span>•</span>
               <a href="https://cloud.google.com/security" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition-colors">Model Armor</a>
+              <span>•</span>
+              <a href="https://cloud.google.com/sensitive-data-protection" target="_blank" rel="noreferrer" className="hover:text-slate-300 transition-colors">Cloud DLP</a>
             </div>
           </div>
         </footer>
