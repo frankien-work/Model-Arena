@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { SUPPORTED_MODELS } from '@/lib/models';
+import { SUPPORTED_MODELS, getModelConfig } from '@/lib/models';
 import {
   simulateVulnerableResponse,
   inspectAndProtect,
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       },
     } = await req.json();
 
-    const model = SUPPORTED_MODELS[modelId] || SUPPORTED_MODELS['gemini-3-8-flash'] || Object.values(SUPPORTED_MODELS)[0];
+    const model = getModelConfig(modelId);
 
     // 1. Compute Vulnerable Result (Guardrails OFF)
     const vulnerableOutput = simulateVulnerableResponse(modelId, attackId);

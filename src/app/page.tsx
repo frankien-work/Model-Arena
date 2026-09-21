@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { SUPPORTED_MODELS, ModelConfig } from '@/lib/models';
+import { SUPPORTED_MODELS, ModelConfig, getModelConfig } from '@/lib/models';
 import { ATTACK_PRESETS, AttackPreset, GuardrailSettings } from '@/lib/security-engine';
 
 export default function SecurityArenaPage() {
@@ -67,7 +67,7 @@ export default function SecurityArenaPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel, selectedAttack.id]);
 
-  const activeModelConfig = SUPPORTED_MODELS[selectedModel] || SUPPORTED_MODELS['gemini-3-8-flash'] || Object.values(SUPPORTED_MODELS)[0];
+  const activeModelConfig = getModelConfig(selectedModel);
 
   return (
     <div className="space-y-6">

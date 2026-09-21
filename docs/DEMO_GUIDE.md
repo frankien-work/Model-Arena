@@ -56,5 +56,5 @@ This guide provides presentation scripts for **Sales Engineers (SEs)** and **Acc
 ### Objection: *"Can't we just write our own regex or use open-source LlamaGuard?"*
 > **Winning Answer:** *"You can, but LlamaGuard requires running dedicated GPU instances 24/7, costing you $500+ every month and adding 200–400ms of latency. Google Cloud Model Armor is 100% serverless, costs fractions of a cent per request, inspects in sub-20ms, and integrates directly with Security Command Center."*
 
-### Objection: *"We use Claude 3.5 Sonnet, not Gemini. Does this help us?"*
-> **Winning Answer:** *"Yes! That's one of Google Cloud's biggest strengths. By hosting Claude 3.5 Sonnet on Vertex AI, you can wrap Claude in Google's Model Armor and Cloud DLP, giving you an enterprise security perimeter that isn't possible with direct API keys."*
+### Objection: *"We use Claude 3.7 Sonnet, not Gemini. Does this help us?"*
+> **Winning Answer:** *"Yes! That's one of Google Cloud's biggest strengths. By hosting Claude 3.7 Sonnet on Vertex AI, you can wrap Claude in Google's Model Armor and Cloud DLP, giving you an enterprise security perimeter that isn't possible with direct API keys."*

@@ -17,7 +17,7 @@ export async function GET() {
       { model: 'Gemini 3.8 Flash', p50: 125, p95: 165, p99: 190, costPer1MIn: 0.10, costPer1MOut: 0.40 },
       { model: 'Gemini 2.0 Flash Thinking', p50: 195, p95: 260, p99: 315, costPer1MIn: 0.10, costPer1MOut: 0.40 },
       { model: 'Gemini 1.5 Pro (002)', p50: 310, p95: 420, p99: 580, costPer1MIn: 1.25, costPer1MOut: 5.00 },
-      { model: 'Claude 3.5 Sonnet v2', p50: 285, p95: 390, p99: 490, costPer1MIn: 3.00, costPer1MOut: 15.00 },
+      { model: 'Claude 3.7 Sonnet', p50: 275, p95: 380, p99: 470, costPer1MIn: 3.00, costPer1MOut: 15.00 },
       { model: 'Llama 3.3 70B', p50: 235, p95: 340, p99: 410, costPer1MIn: 0.35, costPer1MOut: 0.40 },
       { model: 'DeepSeek R1', p50: 360, p95: 490, p99: 610, costPer1MIn: 0.55, costPer1MOut: 2.19 },
       { model: 'Mistral Large 2', p50: 270, p95: 375, p99: 480, costPer1MIn: 2.00, costPer1MOut: 6.00 },
