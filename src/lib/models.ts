@@ -1,7 +1,8 @@
 export interface ModelConfig {
   id: string;
   name: string;
-  provider: 'Google' | 'Anthropic' | 'Meta' | 'Mistral';
+  provider: 'Google' | 'Anthropic' | 'Meta' | 'Mistral' | 'DeepSeek';
+  vertexModelId: string; // Exact Vertex AI / Model Garden publisher endpoint
   tagline: string;
   contextWindow: string;
   badgeColor: string;
@@ -14,27 +15,41 @@ export const SUPPORTED_MODELS: Record<string, ModelConfig> = {
     id: 'gemini-2.0-flash',
     name: 'Gemini 2.0 Flash',
     provider: 'Google',
+    vertexModelId: 'gemini-2.0-flash',
     tagline: 'Ultra-low latency frontier intelligence on Vertex AI',
     contextWindow: '1,000,000 tokens',
     badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     accentColor: '#4285F4',
     vulnerabilityTendency: 'Fast execution; susceptible to complex roleplay DAN jailbreaks if unarmored',
   },
+  'gemini-2.0-flash-thinking': {
+    id: 'gemini-2.0-flash-thinking',
+    name: 'Gemini 2.0 Flash Thinking',
+    provider: 'Google',
+    vertexModelId: 'gemini-2.0-flash-thinking-exp-01-21',
+    tagline: 'Built-in reasoning & chain-of-thought traces on Vertex AI',
+    contextWindow: '1,000,000 tokens',
+    badgeColor: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+    accentColor: '#06B6D4',
+    vulnerabilityTendency: 'Exposes internal reasoning traces & secret instructions unless filtered by Model Armor',
+  },
   'gemini-1.5-pro': {
     id: 'gemini-1.5-pro',
-    name: 'Gemini 1.5 Pro',
+    name: 'Gemini 1.5 Pro (002)',
     provider: 'Google',
+    vertexModelId: 'gemini-1.5-pro-002',
     tagline: 'High-reasoning multi-modal model with 2M context',
     contextWindow: '2,000,000 tokens',
     badgeColor: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
     accentColor: '#8B5CF6',
-    vulnerabilityTendency: 'Strong instruction adherence; vulnerable to indirect RAG prompt poisoning in long context',
+    vulnerabilityTendency: 'Strong instruction adherence; vulnerable to indirect RAG prompt poisoning in massive context',
   },
   'claude-3-5-sonnet': {
     id: 'claude-3-5-sonnet',
-    name: 'Claude 3.5 Sonnet',
+    name: 'Claude 3.5 Sonnet v2',
     provider: 'Anthropic',
-    tagline: 'Frontier software engineering & reasoning via Vertex MaaS',
+    vertexModelId: 'claude-3-5-sonnet-v2@20241022',
+    tagline: 'Upgraded flagship coding & reasoning via Vertex MaaS',
     contextWindow: '200,000 tokens',
     badgeColor: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     accentColor: '#F59E0B',
@@ -42,19 +57,32 @@ export const SUPPORTED_MODELS: Record<string, ModelConfig> = {
   },
   'llama-3-3-70b': {
     id: 'llama-3-3-70b',
-    name: 'Llama 3.3 70B',
+    name: 'Llama 3.3 70B Instruct',
     provider: 'Meta',
-    tagline: 'Open-weights powerhouse on Vertex Model Garden',
+    vertexModelId: 'meta/llama-3.3-70b-instruct-maas',
+    tagline: 'Matches 405B capabilities at 70B price & latency in Model Garden',
     contextWindow: '128,000 tokens',
     badgeColor: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
     accentColor: '#10B981',
     vulnerabilityTendency: 'High susceptibility to direct prompt injection, system prompt extraction, and raw SQL commands',
   },
+  'deepseek-r1': {
+    id: 'deepseek-r1',
+    name: 'DeepSeek R1',
+    provider: 'DeepSeek',
+    vertexModelId: 'deepseek-ai/deepseek-r1-maas',
+    tagline: 'Open-weights reasoning powerhouse on Vertex Model Garden',
+    contextWindow: '64,000 tokens',
+    badgeColor: 'bg-indigo-500/20 text-indigo-400 border-indigo-500/30',
+    accentColor: '#6366F1',
+    vulnerabilityTendency: 'Reasoning tokens can leak private system constraints or execute unverified agent tools',
+  },
   'mistral-large': {
     id: 'mistral-large',
-    name: 'Mistral Large 2',
+    name: 'Mistral Large 2 (2407)',
     provider: 'Mistral',
-    tagline: 'Leading European frontier model available on Vertex AI',
+    vertexModelId: 'mistralai/mistral-large-2407',
+    tagline: 'Leading European frontier model available on Vertex Model Garden',
     contextWindow: '128,000 tokens',
     badgeColor: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     accentColor: '#EA580C',
