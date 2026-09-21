@@ -15,6 +15,7 @@ export interface DlpDeidentifyResult {
     endpoint: string;
     httpStatus?: number | string;
     error?: string;
+    rawResponse?: any;
   };
 }
 
@@ -33,7 +34,7 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
   let liveError: string | null = null;
   let liveHttpStatus: number | null = null;
 
-  // Try live Google Cloud DLP API if credentials exist
+  // Try live Google Cloud DLP API
   if (token && projectId) {
     const endpoints = [
       `https://dlp.googleapis.com/v2/projects/${projectId}/locations/global/content:deidentify`,
@@ -95,6 +96,7 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
             apiDetails: {
               endpoint,
               httpStatus: response.status,
+              rawResponse: data,
             },
           };
         } else {
@@ -109,50 +111,16 @@ export async function deidentifyWithCloudDlp(text: string): Promise<DlpDeidentif
     liveError = 'No ADC Access Token available';
   }
 
-  // Fallback pattern-based DLP engine
-  const findings: DlpFinding[] = [];
-  let sanitized = text;
-
-  const ssnRegex = /\b\d{3}-\d{2}-\d{4}\b/g;
-  const ccRegex = /\b(?:4[0-9]{3}[- ]?[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4})\b/g;
-  const emailRegex = /\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b/g;
-
-  if (ssnRegex.test(text)) {
-    findings.push({
-      infoType: 'US_SOCIAL_SECURITY_NUMBER',
-      likelihood: 'VERY_LIKELY',
-      mitigation: 'Tokenized SSN with [US_SOCIAL_SECURITY_NUMBER]',
-    });
-    sanitized = sanitized.replace(ssnRegex, '[US_SOCIAL_SECURITY_NUMBER]');
-  }
-
-  if (ccRegex.test(text)) {
-    findings.push({
-      infoType: 'CREDIT_CARD_NUMBER',
-      likelihood: 'VERY_LIKELY',
-      mitigation: 'Tokenized Card Number with [CREDIT_CARD_NUMBER]',
-    });
-    sanitized = sanitized.replace(ccRegex, '[CREDIT_CARD_NUMBER]');
-  }
-
-  if (emailRegex.test(text)) {
-    findings.push({
-      infoType: 'EMAIL_ADDRESS',
-      likelihood: 'LIKELY',
-      mitigation: 'Tokenized Email with [EMAIL_ADDRESS]',
-    });
-    sanitized = sanitized.replace(emailRegex, '[EMAIL_ADDRESS]');
-  }
-
+  // Pure live transparency: Return the actual status without mocking
   return {
-    sanitizedText: sanitized,
-    findings,
+    sanitizedText: text,
+    findings: [],
     isLiveApi: false,
     latencyMs: Date.now() - startTime,
     apiDetails: {
-      endpoint: `https://dlp.googleapis.com/v2/projects/${projectId}/content:deidentify`,
-      httpStatus: liveHttpStatus || 'FALLBACK_LOCAL',
-      error: liveError || 'Used pattern inspection',
+      endpoint: `https://dlp.googleapis.com/v2/projects/${projectId}/locations/global/content:deidentify`,
+      httpStatus: liveHttpStatus || 'ERROR',
+      error: liveError || 'Failed to call Cloud DLP API',
     },
   };
 }

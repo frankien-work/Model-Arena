@@ -127,8 +127,8 @@ export async function inspectWithModelArmor(
             category: 'Prompt Injection',
             severity: 'CRITICAL',
             confidence: 0.98,
-            description: 'Model Armor Prompt Injection filter identified adversarial instruction override.',
-            matchedPattern: 'Model Armor Live Heuristic / LLM Judge',
+            description: 'Google Cloud Model Armor flagged adversarial prompt injection / system instruction override.',
+            matchedPattern: 'modelarmor.googleapis.com (Prompt Injection Filter)',
           });
         }
 
@@ -137,8 +137,8 @@ export async function inspectWithModelArmor(
             category: 'Jailbreak (DAN)',
             severity: 'CRITICAL',
             confidence: 0.97,
-            description: 'Model Armor Jailbreak filter blocked adversarial persona evasion.',
-            matchedPattern: 'Model Armor Live Persona Defense',
+            description: 'Google Cloud Model Armor flagged adversarial persona / jailbreak evasion.',
+            matchedPattern: 'modelarmor.googleapis.com (Jailbreak Defense)',
           });
         }
 
@@ -147,8 +147,8 @@ export async function inspectWithModelArmor(
             category: 'PII Leakage',
             severity: 'HIGH',
             confidence: 0.95,
-            description: 'Model Armor sensitive data filter flagged customer identifiers.',
-            matchedPattern: 'Model Armor DLP Integration',
+            description: 'Google Cloud Model Armor detected sensitive identifiers in payload.',
+            matchedPattern: 'modelarmor.googleapis.com (DLP Filter)',
           });
         }
 
@@ -189,100 +189,29 @@ export async function inspectWithModelArmor(
       } else {
         const errBody = await response.text();
         liveApiError = `HTTP ${response.status}: ${errBody}`;
-        console.warn(`Live Model Armor returned non-200: ${liveApiError}`);
+        console.warn(`Live Model Armor returned error: ${liveApiError}`);
       }
     } catch (err: any) {
       liveApiError = err?.message || String(err);
-      console.warn('Live Model Armor API error:', liveApiError);
+      console.warn('Live Model Armor API network error:', liveApiError);
     }
   } else {
-    liveApiError = 'No GCP Access Token available (Local environment without ADC)';
+    liveApiError = 'No GCP Access Token available in current environment';
   }
 
-  // 2. High-Fidelity Local Semantic Inspection Engine (fallback when live API is unprovisioned)
-  const findings: SecurityFinding[] = [];
-  const lower = text.toLowerCase();
-
-  // 1. Direct Prompt Injection & Instruction Overrides
-  if (
-    lower.includes('ignore all previous') ||
-    lower.includes('disregard all previous') ||
-    lower.includes('override system prompt') ||
-    lower.includes('system diagnostic override') ||
-    lower.includes('forget your rules') ||
-    lower.includes('new instructions:')
-  ) {
-    findings.push({
-      category: 'Prompt Injection',
-      severity: 'CRITICAL',
-      confidence: 0.98,
-      description: 'Attempted override of system instructions detected.',
-      matchedPattern: 'Instruction Override Keyword Sequence',
-    });
-  }
-
-  // 2. Jailbreak / DAN persona bypasses
-  if (
-    lower.includes('dan mode') ||
-    lower.includes('jailbreak') ||
-    lower.includes('do anything now') ||
-    lower.includes('unfiltered mode') ||
-    lower.includes('roleplay as an evil') ||
-    lower.includes('role of dan')
-  ) {
-    findings.push({
-      category: 'Jailbreak (DAN)',
-      severity: 'CRITICAL',
-      confidence: 0.97,
-      description: 'Adversarial jailbreak persona detected.',
-      matchedPattern: 'DAN / Persona Evasion Heuristic',
-    });
-  }
-
-  // 3. Customer PII / Sensitive Data
-  const hasSSN = /\b\d{3}-\d{2}-\d{4}\b/.test(text);
-  const hasCC = /\b(?:4[0-9]{3}[- ]?[0-9]{4}[- ]?[0-9]{4}[- ]?[0-9]{4})\b/.test(text);
-  if (hasSSN || hasCC) {
-    findings.push({
-      category: 'PII Leakage',
-      severity: 'HIGH',
-      confidence: 0.96,
-      description: 'Sensitive customer identifiers (SSN / Credit Card) found in payload.',
-      matchedPattern: 'Customer Financial / ID InfoType',
-    });
-  }
-
+  // Pure live transparency: Return the actual error from Google Cloud without simulating
   const latencyMs = Date.now() - startTime;
-  const scceEventId = `SCCE-${Date.now().toString(36).toUpperCase()}-${Math.floor(Math.random() * 1000)}`;
-
-  if (findings.length > 0) {
-    return {
-      action: 'BLOCK',
-      riskScore: 96,
-      latencyMs: Math.max(14, latencyMs),
-      findings,
-      scceEventId,
-      isLiveApi: false,
-      apiDetails: {
-        endpoint: `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates/${templateId}:sanitizeUserPrompt`,
-        httpStatus: liveHttpStatus || 'FALLBACK_LOCAL',
-        templateUsed: templateId,
-        error: liveApiError || 'API returned non-200, used local inspection engine',
-      },
-    };
-  }
-
   return {
     action: 'ALLOW',
-    riskScore: 4,
-    latencyMs: Math.max(12, latencyMs),
+    riskScore: 0,
+    latencyMs,
     findings: [],
     isLiveApi: false,
     apiDetails: {
       endpoint: `https://modelarmor.googleapis.com/v1/projects/${projectId}/locations/${region}/templates/${templateId}:sanitizeUserPrompt`,
-      httpStatus: liveHttpStatus || 'FALLBACK_LOCAL',
+      httpStatus: liveHttpStatus || 'ERROR',
       templateUsed: templateId,
-      error: liveApiError || 'No threat detected',
+      error: liveApiError || 'Failed to connect to live Model Armor endpoint',
     },
   };
 }

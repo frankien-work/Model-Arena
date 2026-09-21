@@ -60,7 +60,7 @@ gcloud run deploy "${SERVICE_NAME}" \
   --memory=1Gi \
   --concurrency=80 \
   --timeout=300 \
-  --set-env-vars="GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${REGION},NODE_ENV=production" \
+  --set-env-vars="GCP_PROJECT_ID=${PROJECT_ID},GCP_REGION=${REGION},MODEL_ARMOR_TEMPLATE_ID=model-arena-guardrail,NODE_ENV=production" \
   --quiet
 
 echo "============================================================"

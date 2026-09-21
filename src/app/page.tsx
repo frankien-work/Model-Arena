@@ -318,17 +318,17 @@ export default function SecurityArenaPage() {
                   </span>
                 ) : (
                   <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800 border border-amber-300">
-                    OFFLINE FALLBACK
+                    API NOT CONNECTED
                   </span>
                 )}
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-800 border border-rose-200">
-                  ATTACK SUCCEEDED
+                  {result?.vulnerable?.isLive ? 'RAW UNARMORED' : 'PENDING'}
                 </span>
               </div>
             </div>
 
             <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
-              <span>Raw model execution without Model Armor or DLP:</span>
+              <span>Direct model execution without Model Armor or DLP:</span>
               {result?.vulnerable?.modelActual && (
                 <span className="font-mono text-[11px] text-slate-700 font-semibold">
                   Model: {result.vulnerable.modelActual}
@@ -337,19 +337,21 @@ export default function SecurityArenaPage() {
             </div>
 
             <div className="bg-white p-4 rounded-xl border border-rose-200 text-xs font-mono text-slate-800 whitespace-pre-wrap leading-relaxed min-h-[200px] max-h-[340px] overflow-y-auto shadow-inner">
-              {result?.vulnerable?.output || 'Executing attack without security filters...'}
+              {result?.vulnerable?.output || 'Executing attack directly on Vertex AI...'}
             </div>
           </div>
 
           {/* Risk Metrics Card */}
           <div className="p-3.5 rounded-xl bg-white border border-rose-200 text-xs font-mono space-y-1.5 text-slate-700 shadow-xs">
             <div className="flex justify-between">
-              <span>Security Posture:</span>
-              <span className="font-bold text-rose-600">100% UNPROTECTED</span>
+              <span>Execution Status:</span>
+              <span className={`font-bold ${result?.vulnerable?.isLive ? 'text-emerald-700' : 'text-amber-700'}`}>
+                {result?.vulnerable?.apiStatus || 'Ready'}
+              </span>
             </div>
             <div className="flex justify-between">
               <span>Execution Latency:</span>
-              <span className="font-bold text-slate-900">{result?.vulnerable?.latencyMs || 220} ms</span>
+              <span className="font-bold text-slate-900">{result?.vulnerable?.latencyMs ? `${result.vulnerable.latencyMs} ms` : '—'}</span>
             </div>
             {result?.vulnerable?.tokenCount && (
               <div className="flex justify-between text-[11px] text-slate-600">
@@ -360,7 +362,7 @@ export default function SecurityArenaPage() {
               </div>
             )}
             <div className="text-[10px] text-rose-600 pt-1 border-t border-rose-100 font-medium">
-              ❌ Proprietary system constraints or PII exposed to requester.
+              ⚠️ Without Model Armor, models directly process and adhere to adversarial instructions.
             </div>
           </div>
         </div>
@@ -378,7 +380,7 @@ export default function SecurityArenaPage() {
               <div className="flex items-center gap-1.5">
                 <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-blue-100 text-blue-800 border border-blue-300 flex items-center gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-blue-600" />
-                  GCP DEFENSE
+                  LIVE GCP DEFENSE
                 </span>
                 <span
                   className={`text-[10px] font-mono font-bold px-2.5 py-0.5 rounded-full border ${
@@ -395,9 +397,9 @@ export default function SecurityArenaPage() {
             </div>
 
             <div className="flex justify-between items-center text-xs text-slate-500 font-medium">
-              <span>Active defense via Model Armor, Cloud DLP &amp; Agent Gateway:</span>
+              <span>Live defense via Model Armor, Cloud DLP &amp; Agent Gateway:</span>
               <span className="font-mono text-[11px] text-emerald-800 font-semibold">
-                Risk Score: {result?.protected?.riskScore || 96}%
+                Risk Score: {result?.protected?.riskScore !== undefined ? `${result.protected.riskScore}%` : '—'}
               </span>
             </div>
 
@@ -411,7 +413,7 @@ export default function SecurityArenaPage() {
             <div className="flex justify-between">
               <span>Inspection Latency:</span>
               <span className="font-bold text-blue-600">
-                {result?.protected?.latencyOverheadMs || 18} ms
+                {result?.protected?.latencyOverheadMs ? `${result.protected.latencyOverheadMs} ms` : '—'}
               </span>
             </div>
             <div className="flex justify-between">
