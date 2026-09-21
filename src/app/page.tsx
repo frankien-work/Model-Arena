@@ -5,7 +5,7 @@ import { SUPPORTED_MODELS, ModelConfig } from '@/lib/models';
 import { ATTACK_PRESETS, AttackPreset, GuardrailSettings } from '@/lib/security-engine';
 
 export default function SecurityArenaPage() {
-  const [selectedModel, setSelectedModel] = useState<string>('gemini-2.0-flash');
+  const [selectedModel, setSelectedModel] = useState<string>('gemini-3-8-flash');
   const [selectedAttack, setSelectedAttack] = useState<AttackPreset>(ATTACK_PRESETS[0]);
   const [customPrompt, setCustomPrompt] = useState<string>(ATTACK_PRESETS[0].prompt);
   const [presentationMode, setPresentationMode] = useState<boolean>(false);
@@ -67,7 +67,7 @@ export default function SecurityArenaPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedModel, selectedAttack.id]);
 
-  const activeModelConfig = SUPPORTED_MODELS[selectedModel] || SUPPORTED_MODELS['gemini-2.0-flash'];
+  const activeModelConfig = SUPPORTED_MODELS[selectedModel] || SUPPORTED_MODELS['gemini-3-8-flash'] || Object.values(SUPPORTED_MODELS)[0];
 
   return (
     <div className="space-y-6">

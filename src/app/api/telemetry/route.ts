@@ -14,7 +14,7 @@ export async function GET() {
       budgetConsumedPercent: 7.03,
     },
     latencyByModel: [
-      { model: 'Gemini 2.0 Flash', p50: 142, p95: 185, p99: 210, costPer1MIn: 0.10, costPer1MOut: 0.40 },
+      { model: 'Gemini 3.8 Flash', p50: 125, p95: 165, p99: 190, costPer1MIn: 0.10, costPer1MOut: 0.40 },
       { model: 'Gemini 2.0 Flash Thinking', p50: 195, p95: 260, p99: 315, costPer1MIn: 0.10, costPer1MOut: 0.40 },
       { model: 'Gemini 1.5 Pro (002)', p50: 310, p95: 420, p99: 580, costPer1MIn: 1.25, costPer1MOut: 5.00 },
       { model: 'Claude 3.5 Sonnet v2', p50: 285, p95: 390, p99: 490, costPer1MIn: 3.00, costPer1MOut: 15.00 },

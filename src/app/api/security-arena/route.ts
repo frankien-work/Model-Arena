@@ -11,7 +11,7 @@ export const runtime = 'nodejs';
 export async function POST(req: NextRequest) {
   try {
     const {
-      modelId = 'gemini-2.0-flash',
+      modelId = 'gemini-3-8-flash',
       attackId = 'system-prompt-extraction',
       promptText,
       guardrails = {
@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       },
     } = await req.json();
 
-    const model = SUPPORTED_MODELS[modelId] || SUPPORTED_MODELS['gemini-2.0-flash'];
+    const model = SUPPORTED_MODELS[modelId] || SUPPORTED_MODELS['gemini-3-8-flash'] || Object.values(SUPPORTED_MODELS)[0];
 
     // 1. Compute Vulnerable Result (Guardrails OFF)
     const vulnerableOutput = simulateVulnerableResponse(modelId, attackId);

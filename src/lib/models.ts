@@ -11,16 +11,16 @@ export interface ModelConfig {
 }
 
 export const SUPPORTED_MODELS: Record<string, ModelConfig> = {
-  'gemini-2.0-flash': {
-    id: 'gemini-2.0-flash',
-    name: 'Gemini 2.0 Flash',
+  'gemini-3-8-flash': {
+    id: 'gemini-3-8-flash',
+    name: 'Gemini 3.8 Flash',
     provider: 'Google',
-    vertexModelId: 'gemini-2.0-flash',
-    tagline: 'Ultra-low latency frontier intelligence on Vertex AI',
+    vertexModelId: 'gemini-3.8-flash',
+    tagline: 'Latest frontier speed & intelligence on Vertex AI',
     contextWindow: '1,000,000 tokens',
     badgeColor: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     accentColor: '#4285F4',
-    vulnerabilityTendency: 'Fast execution; susceptible to complex roleplay DAN jailbreaks if unarmored',
+    vulnerabilityTendency: 'Ultra-low latency execution; susceptible to complex roleplay DAN jailbreaks if unarmored',
   },
   'gemini-2.0-flash-thinking': {
     id: 'gemini-2.0-flash-thinking',
